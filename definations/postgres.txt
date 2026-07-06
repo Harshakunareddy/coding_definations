@@ -1,0 +1,181 @@
+/*
+========================================
+POSTGRESQL INTERVIEW QUESTIONS (1–20)
+WITH SIMPLE EXPLANATIONS + QUERIES
+========================================
+*/
+
+/*
+1. WHAT IS POSTGRESQL?
+PostgreSQL is an advanced open-source relational database.
+It supports SQL plus advanced features like JSON and indexing.
+It is known for reliability, scalability, and performance.
+*/
+SELECT 'Hello PostgreSQL';
+
+
+/*
+2. POSTGRES vs MYSQL
+Postgres supports advanced features like JSON, window functions.
+It is more strict and powerful for complex queries.
+MySQL is simpler, Postgres is more feature-rich.
+*/
+
+
+/*
+3. DATA TYPES
+Postgres supports many data types like INT, TEXT, BOOLEAN, JSON.
+It also supports custom data types.
+*/
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name TEXT,
+  is_active BOOLEAN
+);
+
+
+/*
+4. SERIAL
+SERIAL is auto-increment in Postgres.
+It automatically generates unique numbers.
+Used for primary keys.
+*/
+INSERT INTO users (name, is_active) VALUES ('Harsha', true);
+
+
+/*
+5. SELECT
+Used to fetch data.
+*/
+SELECT * FROM users;
+
+
+/*
+6. WHERE
+Filters data based on condition.
+*/
+SELECT * FROM users WHERE id = 1;
+
+
+/*
+7. UPDATE
+Modify existing records.
+*/
+UPDATE users SET name = 'Ravi' WHERE id = 1;
+
+
+/*
+8. DELETE
+Remove records from table.
+*/
+DELETE FROM users WHERE id = 1;
+
+
+/*
+9. LIMIT & OFFSET
+LIMIT restricts rows, OFFSET skips rows.
+Used for pagination.
+*/
+SELECT * FROM users LIMIT 5 OFFSET 5;
+
+
+/*
+10. ORDER BY
+Sort results.
+*/
+SELECT * FROM users ORDER BY name ASC;
+
+
+/*
+11. GROUP BY
+Group rows for aggregation.
+*/
+SELECT name, COUNT(*) FROM users GROUP BY name;
+
+
+/*
+12. HAVING
+Filter grouped results.
+*/
+SELECT name, COUNT(*)
+FROM users
+GROUP BY name
+HAVING COUNT(*) > 1;
+
+
+/*
+13. JOINS
+Combine multiple tables.
+*/
+SELECT u.name, o.id
+FROM users u
+INNER JOIN orders o ON u.id = o.user_id;
+
+
+/*
+14. JSON SUPPORT
+Postgres supports JSON and JSONB.
+Useful for storing flexible data.
+*/
+CREATE TABLE data (
+  info JSONB
+);
+
+
+/*
+15. INDEX
+Improves query speed.
+*/
+CREATE INDEX idx_user_name ON users(name);
+
+
+/*
+16. TRANSACTIONS
+Ensures data consistency.
+*/
+BEGIN;
+UPDATE users SET name = 'Test' WHERE id = 1;
+ROLLBACK;
+
+
+/*
+17. VIEWS
+Virtual table based on query.
+*/
+CREATE VIEW user_view AS
+SELECT name FROM users;
+
+
+/*
+18. FUNCTIONS
+Custom logic inside database.
+*/
+CREATE FUNCTION get_users()
+RETURNS TABLE(name TEXT)
+AS $$
+BEGIN
+  RETURN QUERY SELECT name FROM users;
+END;
+$$ LANGUAGE plpgsql;
+
+
+/*
+19. WINDOW FUNCTIONS
+Used for advanced queries like ranking.
+*/
+SELECT name, RANK() OVER (ORDER BY name) FROM users;
+
+
+/*
+20. DIFFERENCE JSON vs JSONB
+JSON stores raw data.
+JSONB stores binary format (faster and indexed).
+JSONB is preferred in most cases.
+*/
+
+
+/*
+========================================
+END OF FILE
+========================================
+*/

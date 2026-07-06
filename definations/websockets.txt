@@ -1,0 +1,154 @@
+/*
+========================================
+WEBSOCKETS INTERVIEW NOTES (FULL)
+========================================
+*/
+
+/*
+1. WHAT IS WEBSOCKET?
+WebSocket is a protocol that allows real-time communication.
+It creates a persistent connection between client and server.
+Unlike HTTP, it does not close after one request-response.
+*/
+
+
+/*
+2. HTTP vs WEBSOCKET
+HTTP → request-response, connection closes
+WebSocket → full-duplex (both can send anytime)
+WebSocket is used for real-time apps.
+*/
+
+
+/*
+3. USE CASES
+Chat applications
+Live notifications
+Online gaming
+Stock price updates
+*/
+
+
+/*
+4. HOW WEBSOCKET WORKS
+Client sends request to upgrade HTTP connection.
+Server accepts and upgrades to WebSocket.
+After that, both can send data anytime.
+*/
+
+
+/*
+5. INSTALL WEBSOCKET LIBRARY (NODE)
+*/
+npm install ws
+
+
+/*
+========================================
+6. SERVER CODE (NODE.JS)
+========================================
+*/
+
+const WebSocket = require("ws");
+
+/*
+Create WebSocket server on port 8080
+*/
+const wss = new WebSocket.Server({ port: 8080 });
+
+/*
+When client connects
+*/
+wss.on("connection", (ws) => {
+    console.log("Client connected");
+
+    /*
+    Receive message from client
+    */
+    ws.on("message", (message) => {
+        console.log("Received:", message.toString());
+
+        /*
+        Send message back to client
+        */
+        ws.send("Server received: " + message);
+    });
+
+    /*
+    Send message on connection
+    */
+    ws.send("Welcome client!");
+});
+
+
+/*
+========================================
+7. CLIENT CODE (BROWSER JS)
+========================================
+*/
+
+const socket = new WebSocket("ws://localhost:8080");
+
+/*
+Connection opened
+*/
+socket.onopen = () => {
+    console.log("Connected to server");
+
+    // send message
+    socket.send("Hello Server");
+};
+
+/*
+Receive message
+*/
+socket.onmessage = (event) => {
+    console.log("From server:", event.data);
+};
+
+/*
+Connection closed
+*/
+socket.onclose = () => {
+    console.log("Connection closed");
+};
+
+
+/*
+========================================
+8. KEY FEATURES
+========================================
+
+- Real-time communication
+- Full duplex (two-way)
+- Low latency
+- Persistent connection
+*/
+
+
+/*
+========================================
+9. SOCKET.IO (IMPORTANT)
+========================================
+
+Socket.IO is a library built on top of WebSocket.
+It provides fallback (works even if WS fails).
+Easier to use than raw WebSocket.
+*/
+
+
+/*
+========================================
+10. INTERVIEW DIFFERENCE
+========================================
+
+WebSocket → raw protocol
+Socket.IO → library using WebSocket + extra features
+*/
+
+
+/*
+========================================
+END OF FILE
+========================================
+*/

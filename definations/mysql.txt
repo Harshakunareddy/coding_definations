@@ -1,0 +1,194 @@
+/*
+========================================
+MYSQL INTERVIEW QUESTIONS (1–20)
+WITH SIMPLE EXPLANATIONS + QUERIES
+========================================
+*/
+
+/*
+1. WHAT IS MYSQL?
+MySQL is a relational database management system (RDBMS).
+It stores data in tables using rows and columns.
+It uses SQL (Structured Query Language) to manage data.
+*/
+--Example:
+SELECT "Hello MySQL";
+
+
+/*
+2. DATABASE vs TABLE
+Database is a collection of tables.
+Table stores actual data in rows and columns.
+Each table has a structure defined by schema.
+*/
+
+
+/*
+3. PRIMARY KEY
+Primary key uniquely identifies each row.
+It cannot be NULL and must be unique.
+Used for indexing and relationships.
+*/
+CREATE TABLE users(
+    id INT PRIMARY KEY,
+    name VARCHAR(50)
+);
+
+
+/*
+4. FOREIGN KEY
+Foreign key creates relation between tables.
+It references primary key of another table.
+Used to maintain data integrity.
+*/
+CREATE TABLE orders(
+    id INT,
+    user_id INT,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+
+/*
+5. INSERT DATA
+Used to add new records into table.
+*/
+INSERT INTO users(id, name) VALUES(1, 'Harsha');
+
+
+/*
+6. SELECT QUERY
+Used to fetch data from table.
+*/
+SELECT * FROM users;
+
+
+/*
+7. WHERE CLAUSE
+Used to filter records based on condition.
+*/
+SELECT * FROM users WHERE id = 1;
+
+
+/*
+8. UPDATE
+Used to modify existing data.
+*/
+UPDATE users SET name = 'Ravi' WHERE id = 1;
+
+
+/*
+9. DELETE
+Used to remove records from table.
+*/
+DELETE FROM users WHERE id = 1;
+
+
+/*
+10. LIMIT
+Used to restrict number of rows returned.
+*/
+SELECT * FROM users LIMIT 5;
+
+
+/*
+11. ORDER BY
+Used to sort results.
+ASC → ascending, DESC → descending.
+*/
+SELECT * FROM users ORDER BY name ASC;
+
+
+/*
+12. GROUP BY
+Used to group similar data.
+Often used with aggregate functions.
+*/
+SELECT name, COUNT(*) FROM users GROUP BY name;
+
+
+/*
+13. HAVING
+Used to filter grouped data.
+Works after GROUP BY.
+*/
+SELECT name, COUNT(*) 
+FROM users 
+GROUP BY name 
+HAVING COUNT(*) > 1;
+
+
+/*
+14. JOINS
+Used to combine data from multiple tables.
+INNER JOIN returns matching records.
+*/
+SELECT users.name, orders.id
+FROM users
+INNER JOIN orders ON users.id = orders.user_id;
+
+
+/*
+15. LEFT JOIN
+Returns all records from left table.
+And matching records from right table.
+*/
+SELECT *
+    FROM users
+LEFT JOIN orders ON users.id = orders.user_id;
+
+
+/*
+16. INDEX
+Index improves query performance.
+Speeds up searching operations.
+But increases storage.
+*/
+CREATE INDEX idx_name ON users(name);
+
+
+/*
+17. NORMALIZATION
+Process of organizing data to reduce redundancy.
+Divides tables properly.
+Improves data consistency.
+*/
+
+
+/*
+18. TRANSACTIONS
+Transaction ensures all queries run successfully.
+If one fails, rollback happens.
+*/
+START TRANSACTION;
+UPDATE users SET name = 'Test' WHERE id = 1;
+ROLLBACK;
+
+
+/*
+19. VIEWS
+View is a virtual table based on query.
+Does not store actual data.
+Used for security and simplicity.
+*/
+CREATE VIEW user_view AS
+SELECT name FROM users;
+
+
+/*
+20. STORED PROCEDURE
+Stored procedure is saved SQL logic.
+Can be reused multiple times.
+Improves performance.
+*/
+DELIMITER //
+CREATE PROCEDURE GetUsers()
+BEGIN
+SELECT * FROM users;
+END //
+DELIMITER;
+
+/*
+========================================
+END OF FILE
+========================================
+*/

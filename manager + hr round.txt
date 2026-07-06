@@ -1,0 +1,141 @@
+manager + hr round
+
+In my previous company, Techland IT Solutions LLP, 
+PF was not implemented for any employee,
+so I do not have an EP number or UAN.
+
+
+What is your expected CTC?
+I value learning and growth more at this stage.”
+“I’m flexible and open to TCS’s band for this role; 
+
+
+Speak slowly, use your own words, and back answers with a short example from your project.
+
+If you don’t know something, say 
+“I haven’t worked on that yet but I can learn quickly,”
+
+
+
+
+
+15 Manager-Round Questions & short answers
+
+(Use steady voice; give 1 example when possible.)
+
+Tell me about your role in the project.
+
+“I built backend APIs using Node.js, connected them to MySQL, and handled bug fixes and deployments — I owned two endpoints end-to-end.”
+
+Explain a tough bug you fixed.
+
+location_json column needs to be {lat,lon}
+
+
+How did you estimate and plan tasks?
+
+“I broke features into small tickets, gave time estimates per ticket, and updated progress daily so the manager could reprioritize if needed.”
+
+How do you handle missed deadlines?
+
+“I inform the manager early, explain blockers, propose a recovery plan, and work extra hours if required to meet the new deadline.”
+
+Describe a time you improved performance.
+an api is queried without joins and included a 4-5 tables 
+
+How do you ensure code quality?
+“I write unit tests, follow code style, and use PR reviews — 
+I always run lint/tests before raising a PR.”
+
+How do you handle conflicting feedback?
+“I listen to both sides, 
+test the suggestions if possible, 
+and pick the option that best fits design and timelines.”
+
+Have you led anyone or mentored juniors?
+“I guided an intern on API patterns and reviewed their code weekly, 
+which improved their output and confidence.”
+
+How do you prioritize bugs vs features?
+“Critical production bugs get top priority; 
+otherwise we follow product priority and impact on users.”
+
+Explain a design decision you took.
+20+ items categorie=> i suggested to give 5 per page ui => super
+
+
+How do you ensure security in your APIs?
+token auth middleware => jwt
+
+
+How do you debug production issues?
+checking logs => good way
+reproduce locally if possible
+apply a hotfix and then a stable patch with tests.”
+
+How comfortable are you with deployments?
+“I’ve deployed apps using simple scripts/PM2; 
+monitor logs when apis are hiting likewise 
+
+
+What’s one technical skill you’re learning now?
+“I’m learning AWS .”
+
+Why should we pick you for this role?
+“I have hands-on Node.js + MySQL experience, 
+small saas based apps end to end single handed ly i can handle
+
+
+🔶 15 HR-Round Questions & short answers
+
+Tell me about yourself.
+“I’m Harsha Vardhan Reddy, 14 months experience building Node.js APIs 
+and MySQL schemas; 
+I enjoy solving production bugs and learning DevOps.”
+
+
+Why TCS / why do you want to join us?
+“TCS gives enterprise level apps and steady growth; 
+grow my backend skills here.”
+
+Are you willing to relocate?
+“Yes — I’m flexible and open to relocation based on project needs.”
+
+
+Why did you leave your previous company?
+“For better learning and exposure to larger systems; 
+I want to work on scalable enterprise products.”
+
+
+Are you ready for night shifts / bench?
+“I’m open to reasonable shift requirements 
+and understand business needs.”
+
+Where do you see yourself in 3–5 years?
+“Working at a senior position and mentoring juniors.”
+
+What are your strengths?
+“Good problem solving, quick debugging, and reliable delivery.”
+
+What are your weaknesses?
+“I think my communication skills, I’m trying to improve it.”
+
+
+Any gaps in employment / notice period?
+2 months and i will definetly try to reduce it to 35 - 40 days
+
+
+Can you share documents for verification?
+“Yes — I have offer/experience letters, 
+payslips, and academic documents ready.”
+
+Are you pursuing higher studies?
+NO i am not.
+
+How do you handle work pressure?
+“I prioritize tasks, 
+ask for help when blocked, 
+and communicate timelines to stakeholders.”
+
+Do you have any questions for us? (Always ask one)
+what are the work responsibilities for the first 6 months in this role?

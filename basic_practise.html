@@ -1,0 +1,146 @@
+<html>
+<script>
+    function StringReverse(str) {
+        return str.split('').reverse().join('');
+    }
+</script>
+
+
+<script>
+    function swapWithThird(a, b) {
+        let temp = a;
+        let a = b;
+        let b = a;
+        return { a, b };
+    }
+    console.log(swapWithThird(10, 20));
+</script>
+
+<script>
+    // palindrome
+    return str = str.split('').reverse().join('');
+</script>
+
+<script>
+    return Math.max(...arr);
+</script>
+
+<script>
+    // remove duplicates from array
+    return [...new Set(arr)];
+</script>
+
+<script>
+    function RemoveDuplicatesWithoutnewSetHelper(arr) {
+        let ch = {};
+        for (let i of arr) {
+            ch[i] = (ch[i] || 0) + 1;
+        }
+        return ch;
+    }
+    function RemoveDuplicatesWithoutnewSet(arr) {
+        let chars = RemoveDuplicatesWithoutnewSetHelper(arr);
+        let result = [];
+        for (let i = 0; i < arr.length; i++) {
+            if (chars[i] > 0) {
+                result.push(i);
+                chars[i] = 0;
+            }
+        }
+        return result;
+    }
+    console.log(RemoveDuplicatesWithoutnewSet([1, 2, 1, 2, 3, 4, 3, 5]));
+</script>
+
+<script>
+    function RemoveDup(arr) {
+        let seen = {};
+        let result = [];
+        for (let i of arr) {
+            if (!seen[i]) {
+                seen[i] = true;
+                result.push(i);
+            }
+        }
+        return result;
+    }
+    console.log(RemoveDup([1, 0, 1, 2, 3, 5]));
+</script>
+
+
+<script>
+    function PrimeOrNot(n) {
+        for (let i = 2; i <= Math.sqrt(num); i++) {
+            if ((n % i) == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+</script>
+
+
+<script>
+    function factorial(n) {
+        let a = 1;
+        for (let i = 1; i <= n; i++) {
+            a *= i;
+        }
+        return a;
+    }
+</script>
+
+<script>
+    // arr.filter(n => n%2 == 0); even
+    // arr.filter(n => n%2 !== 0); odd
+</script>
+<!-- [a,b] = [b,a] -->
+
+<script>
+    let total = (n * (n + 1)) / 2;
+    let sum = arr.reduce((a, b) => a + b, 0);
+    rem = total - sum;
+</script>
+
+<script>
+    let neg = arr.filter(n => n < 0);
+    let posi = arr.filter(n => n > 0);
+</script>
+
+<script>
+    let unqArra = new Set(arr1);
+
+    for (let i of arr2) {
+        if (unqArra.has(i)) {
+            result.push(i);
+        }
+    }
+    return result;
+</script>
+
+
+<script>
+    // pivot index
+    // let leftSum = 0;
+    // rightSum = totalSum - leftSum - nums[i];
+    // == => return i
+    // else leftsum += nums[i]
+</script>
+
+<script>
+    // longestcommanprefix
+    let firstWOrd = nums[0];
+    for (let i = 0; i < n.length; i++) {
+        while (n[i].indexOf(firstWOrd) !== 0) {
+            firstWOrd = firstWOrd.slice(0, -1);
+            if (firstWOrd == "") return "";
+        }
+    }
+    return firstWOrd;
+</script>
+
+<script>
+
+</script>
+
+</html>

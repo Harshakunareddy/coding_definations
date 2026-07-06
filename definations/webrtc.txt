@@ -1,0 +1,174 @@
+/*
+========================================
+WEBRTC INTERVIEW NOTES (FULL)
+========================================
+*/
+
+/*
+1. WHAT IS WEBRTC?
+WebRTC (Web Real-Time Communication) allows browsers to communicate directly.
+It enables video, audio, and data sharing without a server in between.
+Used for real-time apps like video calls.
+*/
+
+
+/*
+2. WHY WEBRTC?
+It provides peer-to-peer (P2P) connection.
+Low latency because data flows directly between users.
+No need for heavy backend for media transfer.
+*/
+
+
+/*
+3. USE CASES
+Video calling (Zoom, Google Meet)
+Voice calling
+Screen sharing
+Real-time file transfer
+*/
+
+
+/*
+4. IMPORTANT COMPONENTS
+
+RTCPeerConnection → connects two users
+getUserMedia() → access camera/mic
+RTCDataChannel → send data (chat, files)
+*/
+
+
+/*
+5. HOW WEBRTC WORKS (FLOW)
+
+1. Get media (camera/mic)
+2. Create peer connection
+3. Exchange SDP (offer/answer)
+4. Exchange ICE candidates
+5. Direct connection established
+*/
+
+
+/*
+6. SIGNALING (IMPORTANT)
+WebRTC needs signaling server to exchange data (offer/answer).
+Usually done using WebSocket or HTTP.
+After connection, server is not needed.
+*/
+
+
+/*
+7. STUN & TURN SERVERS
+
+STUN → finds public IP address
+TURN → relays data if direct connection fails
+
+INTERVIEW LINE:
+"STUN helps connect directly, TURN is fallback when P2P fails"
+*/
+
+
+/*
+========================================
+8. SIMPLE CODE EXAMPLE
+========================================
+*/
+
+// Get camera and mic
+navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+  .then(stream => {
+    const video = document.getElementById("localVideo");
+    video.srcObject = stream;
+  });
+
+
+/*
+Create Peer Connection
+*/
+const pc = new RTCPeerConnection();
+
+/*
+Create Data Channel
+*/
+const channel = pc.createDataChannel("chat");
+
+/*
+Send message
+*/
+channel.onopen = () => {
+  channel.send("Hello Peer");
+};
+
+/*
+Receive message
+*/
+channel.onmessage = (event) => {
+  console.log("Received:", event.data);
+};
+
+
+/*
+========================================
+9. OFFER / ANSWER
+========================================
+*/
+
+async function createOffer() {
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+  console.log("Offer:", offer);
+}
+
+
+/*
+========================================
+10. ICE CANDIDATES
+========================================
+*/
+
+pc.onicecandidate = (event) => {
+  if (event.candidate) {
+    console.log("ICE Candidate:", event.candidate);
+  }
+};
+
+
+/*
+========================================
+11. KEY FEATURES
+========================================
+
+- Peer-to-peer communication
+- Real-time audio/video
+- Low latency
+- No plugin required
+*/
+
+
+/*
+========================================
+12. WEBRTC vs WEBSOCKET
+========================================
+
+WebSocket → client-server communication
+WebRTC → peer-to-peer communication
+
+WebSocket is used for signaling in WebRTC
+*/
+
+
+/*
+========================================
+13. SECURITY
+========================================
+
+WebRTC uses encryption (DTLS, SRTP)
+All connections are secure by default
+*/
+
+
+/*
+========================================
+END OF FILE
+========================================
+*/

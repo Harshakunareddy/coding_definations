@@ -1,0 +1,661 @@
+<!-- 10 + 5 + 10 mysql things  -->
+<!-- +20 js ultra basic array , strings, decode, encode, pop, push etc -->
+<!-- + 30 backedn nodejs + mysql dev qnad a in simple 2 line answers -->
+<!-- manager round = 10 + hr round 10 -->
+
+<html>
+
+<script>
+    function StringReverse(str) {
+        return str.split('').reverse().join('');
+    }
+
+    console.log(StringReverse("hvre"));
+</script>
+
+<script>
+    function swapWithThird(a, b) {
+        let temp = a;
+        a = b;
+        b = temp;
+        return { a, b };
+    }
+
+    console.log(swapWithThird(10, 20));
+</script>
+
+
+<script>
+    function PalindromeOrNot(str) {
+        return str === str.split('').reverse().join('');
+    }
+
+    console.log(PalindromeOrNot("heh"));
+</script>
+
+
+
+
+<script>
+    function LargetNumberInArray(arr) {
+        return Math.max(...arr);
+    }
+
+    console.log(LargetNumberInArray([1, 200, 3, 45, 4]));
+</script>
+
+
+<script>
+    function RemoveDuplicatesFromArray(arr) {
+        return [...new Set(arr)];
+    }
+
+    console.log(RemoveDuplicatesFromArray([1, 200, 3, 45, 4, 1]));
+</script>
+
+
+
+<script>
+    function RemoveDuplicatesWithoutnewSetHelper(arr) {
+        let ch = {};
+        for (let i of arr) {
+            ch[i] = (ch[i] || 0) + 1;
+        }
+        return ch;
+    }
+    function RemoveDuplicatesWithoutnewSet(arr) {
+        let chars = RemoveDuplicatesWithoutnewSetHelper(arr);
+        let result = [];
+        for (let i = 0; i < arr.length; i++) {
+            if (chars[i] > 0) {
+                result.push(i);
+                chars[i] = 0;
+            }
+        }
+        return result;
+    }
+    console.log(RemoveDuplicatesWithoutnewSet([1, 2, 1, 2, 3, 4, 3, 5]));
+</script>
+
+
+
+<script>
+    function RemoveDup(arr) {
+        let seen = {};
+        let result = [];
+        for (let i of arr) {
+            if (!seen[i]) {
+                seen[i] = true;
+                result.push(i);
+            }
+        }
+        return result;
+    }
+    console.log(RemoveDup([1, 0, 1, 2, 3, 5]));
+</script>
+
+
+<script>
+    function CountOccuranceOfChars(str) {
+        let count = {};
+        for (let char of str) {
+            count[char] = (count[char] || 0) + 1;
+        }
+        return count;
+    }
+
+    console.log(CountOccuranceOfChars("tcs it solutions"));
+</script>
+
+
+
+<script>
+    function PrimeOrNot(num) {
+        for (let i = 2; i <= Math.sqrt(num); i++) {
+            if ((num % i) == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    console.log(PrimeOrNot(5));
+</script>
+
+
+<script>
+    function FactorialOfNumber(num) {
+        let result = 1;
+        for (let i = 1; i <= num; i++) {
+            result *= i;
+        }
+        return result;
+    }
+
+    console.log(FactorialOfNumber(4));
+</script>
+
+
+<script>
+    function EvenAndOddNumbersFindingInAnArray(arr) {
+        let even = arr.filter(n => n % 2 === 0);
+        let odd = arr.filter(n => n % 2 !== 0);
+        return { even, odd };
+    }
+
+    console.log(EvenAndOddNumbersFindingInAnArray([1, 2, 3, 4, 5, 6]));
+</script>
+
+
+<script>
+    function SwappinOfTwoNumbersWithooutThird(a, b) {
+        [a, b] = [b, a];
+        return { a, b };
+    }
+
+    console.log(SwappinOfTwoNumbersWithooutThird(10, 20));
+</script>
+
+
+<!-- <script>
+    async function getProducts() { 
+        const response = await fetch('/api/products-get',{body: [1,2,3]});
+        const products = response.json();
+        return products;
+    }
+
+    console.log(getProducts());
+</script>
+ -->
+
+
+
+<script>
+    function IsPrimeOrNot(num) {
+        if (num <= 1) return false;
+        for (let i = 2; i <= Math.sqrt(num); i++) {
+            if (num % i == 0) {
+                return false;
+            }
+        }
+        console.log(num);
+        return true;
+    }
+
+    function SumOfPrimeInAnArray(arr) {
+        let answer = 0;
+        for (let i = 0; i < arr.length; i++) {
+            const is_prime = IsPrimeOrNot(arr[i]);
+            if (is_prime === true) {
+                answer += arr[i];
+            }
+        }
+        return answer;
+    }
+
+    console.log(SumOfPrimeInAnArray([1, 2, 3, 4, 5, 6, 7]));
+</script>
+
+
+<script>
+    function findMissingNumber(arr, n) {
+        let total = (n * (n + 1)) / 2;
+        let sum = arr.reduce((a, b) => a + b, 0);
+        return total - sum;
+    }
+    console.log(findMissingNumber([1, 2, 3, 4, 5], 5));
+</script>
+
+
+
+
+<script>
+    function SeparatePostiveNegative(arr) {
+        let positive = arr.filter((n) => n > 0);
+        let negative = arr.filter((n) => n < 0);
+        return { positive, negative };
+    }
+    console.log(SeparatePostiveNegative([1, 2, 3, 4, 5, -9, -3]));
+</script>
+
+
+<script>
+    function FreqCountFromArray(arr) {
+        let count = {};
+        for (let i of arr) {
+            count[i] = (count[i] || 0) + 1;
+        }
+        return count;
+    }
+    console.log(FreqCountFromArray([1, 2, 3, 4, 5, 5, -9, -3]));
+</script>
+
+
+
+<script>
+    function commonElemetsInTwoArrays(arr1, arr2) {
+        let uniqArr1 = new Set(arr1);
+        let result = [];
+        console.log(uniqArr1);
+        for (let i of arr2) {
+            if (uniqArr1.has(i)) {
+                result.push(i);
+            }
+        }
+        return result;
+    }
+    console.log(commonElemetsInTwoArrays([1, 2, 3, 4, 5], [5, -9, -3]));
+</script>
+
+
+
+
+
+</html>
+
+
+
+
+
+
+<!-- 
+
+1️⃣ Create an Array
+An array stores multiple values in one variable.
+Values are accessed using index numbers.
+
+let arr = [1, 2, 3];
+console.log(arr[0]);
+
+
+2️⃣ push()
+Adds an element to the end of an array.
+Changes the original array.
+
+let arr = [1, 2];
+arr.push(3);
+
+
+
+3️⃣ pop()
+
+Removes the last element from an array.
+Returns the removed element.
+
+let arr = [1, 2, 3];
+arr.pop();
+
+
+4️⃣ unshift()
+
+Adds an element at the beginning.
+Moves existing elements forward.
+
+let arr = [2, 3];
+arr.unshift(1);
+
+
+5️⃣ shift()
+
+Removes the first element.
+Array length reduces.
+
+let arr = [1, 2, 3];
+arr.shift();
+
+
+6️⃣ length
+
+Gives total number of elements.
+Index starts from 0.
+
+let arr = [10, 20, 30];
+console.log(arr.length);
+
+
+7️⃣ String length
+
+Returns number of characters.
+Spaces are also counted.
+
+let str = "Hello";
+console.log(str.length);
+
+
+8️⃣ toUpperCase()
+
+Converts string to capital letters.
+Does not change original string.
+
+let str = "hello";
+console.log(str.toUpperCase());
+
+
+9️⃣ toLowerCase()
+
+Converts string to small letters.
+Useful for comparisons.
+
+let str = "HELLO";
+console.log(str.toLowerCase());
+
+
+
+🔟 split()
+
+Converts string into array.
+Splits based on given character.
+
+let str = "a,b,c";
+console.log(str.split(","));
+
+
+
+1️⃣1️⃣ join()
+
+Converts array into string.
+Joins using given symbol.
+
+let arr = ["a", "b", "c"];
+console.log(arr.join("-"));
+
+
+
+1️⃣2️⃣ encodeURI()
+
+Encodes URL safely.
+Special characters are converted.
+
+let url = "https://test.com/a b";
+console.log(encodeURI(url));
+
+
+1️⃣3️⃣ decodeURI()
+
+Decodes encoded URL back.
+Restores original characters.
+
+let url = "https://test.com/a%20b";
+console.log(decodeURI(url));
+
+
+1️⃣4️⃣ encodeURIComponent()
+
+Encodes single value.
+Used for query params.
+
+let val = "a b&c";
+console.log(encodeURIComponent(val));
+
+
+
+1️⃣5️⃣ decodeURIComponent()
+
+Decodes encoded value.
+Reverses encodeURIComponent.
+
+let val = "a%20b%26c";
+console.log(decodeURIComponent(val));
+
+
+
+1️⃣6️⃣ includes()
+
+Checks if value exists.
+Returns true or false.
+
+let arr = [1, 2, 3];
+console.log(arr.includes(2));
+
+
+
+1️⃣7️⃣ indexOf()
+
+Returns index of element.
+Returns -1 if not found.
+
+let arr = ["a", "b", "c"];
+console.log(arr.indexOf("b"));
+
+
+1️⃣8️⃣ forEach()
+
+Runs function for each item.
+Does not return array.
+
+let arr = [1, 2];
+arr.forEach(x => console.log(x));
+
+
+
+
+Method	Returns
+forEach()	undefined
+map()	New array
+filter()	New array
+reduce()	Single value
+
+
+
+1️⃣9️⃣ map()
+
+Creates new array.
+Transforms each element.
+
+let arr = [1, 2];
+let newArr = arr.map(x => x * 2);
+
+
+
+2️⃣0️⃣ filter()
+
+Filters array values.
+Returns matching items.
+
+let arr = [1, 2, 3];
+let res = arr.filter(x => x > 1);
+
+
+
+2️⃣1️⃣ String to Number
+
+Converts string to number.
+Useful for calculations.
+
+let n = "10";
+console.log(Number(n));
+
+
+
+2️⃣2️⃣ Number to String
+
+Converts number to string.
+Useful for display.
+
+let n = 100;
+console.log(n.toString());
+
+
+2️⃣3️⃣ Reverse String
+
+Splits, reverses and joins.
+Classic interview question.
+
+let str = "abc";
+console.log(str.split("").reverse().join(""));
+
+
+
+
+-->
+
+
+
+
+
+
+
+
+<!-- 
+
+1️⃣ What is Node.js?
+
+Node.js allows us to run JavaScript on the server.
+I used it to create APIs that handle frontend requests
+
+2️⃣ Why is Node.js non-blocking?
+
+In Node.js, one API call doesn’t block another.
+So many users can use the app at the same time.
+
+
+API?
+API is a connection between frontend and backend.
+Frontend sends request, backend sends response
+
+Middleware? 
+Middleware runs before API logic.
+I used it for authentication and validation.
+
+
+JWT?
+JWT is used to check whether a user is logged in.
+After login, token is sent with every request
+
+
+MySQL ? 
+MySQL stores application data in tables.
+I used it to store users, orders, and products.
+
+JOIN?
+JOIN is used to get data from multiple tables.
+Example: user details with order details.
+
+Indexing?
+Index makes data searching faster.
+I used it on frequently searched columns.
+
+
+TRY CATCH?
+If API fails, I catch the error and return proper message.
+This avoids server crash.
+
+
+
+What happens when a request comes to a Node.js server?
+Client sends request, Node.js receives it, processes logic,
+then sends response back to client.
+
+
+What is Express routing?
+“Routing decides which API function runs for a URL.
+For example /login or /users.
+
+
+What is req and res?
+“req contains request data from client.
+res is used to send response back
+
+
+How do you connect Node.js with MySQL?
+“I use MySQL driver, create connection,
+and run queries from Node.js.
+
+
+
+Where do you write database queries?
+
+“Queries are written in service or model files.
+Controller only handles request and response.
+
+
+
+What is connection pooling?
+“Instead of creating new DB connection every time,
+we reuse existing connections
+
+
+
+What is HTTP status code?
+“Status codes tell whether request succeeded or failed.
+Example: 200 success, 404 not found.
+
+
+
+Difference between PUT and PATCH?
+
+“PUT updates full record.
+PATCH updates only required fields
+
+
+await pauses execution until the Promise resolves.
+
+async function fetchUser() {
+  const data = await getUserFromDB();
+  console.log(data);
+}
+
+
+Callback
+Error handling is messy
+getUser(id, () => {
+  getOrders(() => {
+    getPayment(() => {
+      // 😵 too nested
+    });
+  });
+});
+
+Promise
+Error handling across many .then() is harder to track
+getUser()
+  .then(user => getOrders(user))
+  .then(orders => getPayment(orders))
+  .then(pay => console.log(pay))
+  .catch(err => console.log(err));
+
+
+
+Async / Await
+Clean & readable code
+Looks like synchronous code
+Centralized error handling (try/catch)
+
+async function processOrder() {
+  try {
+    const user = await getUser();
+    const orders = await getOrders(user);
+    const payment = await getPayment(orders);
+    console.log(payment);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
+“Callbacks were replaced by Promises,
+and async/await makes Promises easier to read and manage.”
+
+
+
+
+
+
+How do you debug Node.js issues?
+“I use console logs and check error messages.
+Also test APIs using Postman.
+
+
+How do you handle pagination?
+
+“I use limit and offset in database queries.
+This avoids loading all records at once
+
+
+
+How do you manage different environments?
+
+“I use environment variables for dev and prod.
+This keeps credentials secure.
+
+-->

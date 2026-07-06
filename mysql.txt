@@ -1,0 +1,86 @@
+mysql
+
+SELECT users.name, orders.product
+FROM users
+JOIN orders ON users.id = orders.user_id;
+
+
+
+LEFT JOIN (All from LEFT table)
+
+Returns all users, even if they have no orders.
+
+SELECT users.name, orders.product
+FROM users
+LEFT JOIN orders ON users.id = orders.user_id;
+
+
+RIGHT JOIN (All from RIGHT table)
+
+Returns all orders, even if user doesn’t exist.
+
+SELECT users.name, orders.product
+FROM users
+RIGHT JOIN orders ON users.id = orders.user_id;
+
+
+Index = faster search
+
+CREATE INDEX idx_user_id ON orders(user_id);
+Used on:
+WHERE
+JOIN
+ORDER BY
+
+
+
+🧱 10 Ultra-Basic MySQL Queries
+
+1️⃣ Create table
+
+CREATE TABLE users (id INT, name VARCHAR(50));
+
+
+2️⃣ Insert data
+
+INSERT INTO users VALUES (1, 'Ram');
+
+
+3️⃣ Select all
+
+SELECT * FROM users;
+
+
+4️⃣ Select specific column
+
+SELECT name FROM users;
+
+
+5️⃣ WHERE condition
+
+SELECT * FROM users WHERE id = 1;
+
+
+6️⃣ Update data
+
+UPDATE users SET name = 'Sam' WHERE id = 1;
+
+
+7️⃣ Delete data
+
+DELETE FROM users WHERE id = 1;
+
+
+8️⃣ Count rows
+
+SELECT COUNT(*) FROM users;
+
+
+9️⃣ Order by
+
+SELECT * FROM users ORDER BY name ASC;
+
+
+🔟 Limit results
+
+SELECT * FROM users LIMIT 5;

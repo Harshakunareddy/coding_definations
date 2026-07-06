@@ -1,0 +1,223 @@
+/*
+========================================
+AWS + DEPLOYMENT INTERVIEW NOTES
+(EC2, S3, PM2, VPS NODE DEPLOYMENT)
+========================================
+*/
+
+/*
+1. WHAT IS AWS?
+AWS (Amazon Web Services) is a cloud platform.
+It provides servers, storage, databases, and more.
+Used to deploy and scale applications easily.
+*/
+
+
+/*
+========================================
+2. EC2 (ELASTIC COMPUTE CLOUD)
+========================================
+
+EC2 is a virtual server in the cloud.
+We use it to run backend apps like Node.js.
+You can choose OS, CPU, RAM based on need.
+
+INTERVIEW LINE:
+"EC2 is a virtual machine used to host backend applications."
+*/
+
+
+/*
+STEPS TO LAUNCH EC2:
+
+1. Go to AWS → EC2 → Launch Instance
+2. Choose Ubuntu
+3. Select instance type (t2.micro free tier)
+4. Create key pair (.pem file)
+5. Allow ports (22 SSH, 80 HTTP, 443 HTTPS)
+6. Launch instance
+*/
+
+
+/*
+CONNECT TO EC2:
+
+chmod 400 key.pem
+
+ssh -i key.pem ubuntu@your-public-ip
+*/
+
+
+/*
+INSTALL NODE ON EC2:
+
+sudo apt update
+sudo apt install nodejs npm -y
+
+node -v
+npm -v
+*/
+
+
+/*
+========================================
+3. NODE APP DEPLOYMENT (VPS / EC2)
+========================================
+
+Upload your project using git:
+
+git clone https://github.com/your-repo.git
+cd your-project
+
+Install dependencies:
+npm install
+
+Run app:
+node index.js
+*/
+
+
+/*
+========================================
+4. PM2 (PROCESS MANAGER)
+========================================
+
+PM2 keeps Node app running forever.
+It restarts app if it crashes.
+Used in production environment.
+
+INTERVIEW LINE:
+"PM2 is used to manage and keep Node.js apps running in background."
+*/
+
+
+/*
+INSTALL PM2:
+*/
+npm install - g pm2
+
+/*
+RUN APP WITH PM2:
+*/
+pm2 start index.js
+
+/*
+CHECK STATUS:
+*/
+pm2 list
+
+/*
+AUTO RESTART ON SERVER REBOOT:
+*/
+pm2 startup
+pm2 save
+
+
+/*
+========================================
+5. NGINX (OPTIONAL BUT IMPORTANT)
+========================================
+
+NGINX is used as reverse proxy.
+It connects domain to Node app.
+
+INTERVIEW LINE:
+"NGINX is used to route traffic from domain to Node server."
+*/
+
+
+/*
+INSTALL NGINX:
+*/
+sudo apt install nginx
+
+/*
+START NGINX:
+*/
+sudo systemctl start nginx
+
+
+/*
+========================================
+6. S3 (SIMPLE STORAGE SERVICE)
+========================================
+
+S3 is used to store files like images, videos, backups.
+It is highly scalable and secure.
+
+INTERVIEW LINE:
+"S3 is used to store static files like images and videos."
+*/
+
+
+/*
+UPLOAD FILES TO S3:
+
+1. Create bucket
+2. Upload files
+3. Make public if needed
+4. Use URL to access
+*/
+
+
+/*
+========================================
+7. VPS DEPLOYMENT FLOW (IMPORTANT)
+========================================
+
+1. Create EC2 instance
+2. Connect via SSH
+3. Install Node.js
+4. Clone project
+5. Run npm install
+6. Start app with PM2
+7. Configure NGINX (optional)
+8. Use domain name (optional)
+
+INTERVIEW LINE:
+"I deploy Node apps by setting up EC2, installing Node,
+running app with PM2, and optionally using NGINX for routing."
+*/
+
+
+/*
+========================================
+8. ENV VARIABLES
+========================================
+
+Store secrets like DB URL safely.
+*/
+export DB_URL = "mongodb://localhost:27017"
+
+
+/*
+========================================
+9. PORTS
+========================================
+
+3000 → Node app
+80 → HTTP
+443 → HTTPS
+22 → SSH
+*/
+
+
+/*
+========================================
+10. SECURITY GROUP
+========================================
+
+Acts like firewall in AWS.
+Controls which ports are open.
+
+Example:
+Allow 22 → SSH
+Allow 80 → HTTP
+*/
+
+
+/*
+========================================
+END OF FILE
+========================================
+*/
