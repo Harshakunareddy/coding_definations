@@ -1,0 +1,211 @@
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f3f6fb;
+  color: #1f2937;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+h2 { text-align: center; margin: 20px 0; }
+h3 { margin-top: 0; }
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.navbar .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.navbar .logo {
+  width: 32px;
+  height: 32px;
+  background: #2563eb;
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.nav-links a:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.nav-links a.active {
+  background: #2563eb;
+  color: white;
+}
+
+.container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+}
+
+.form { flex: 0 0 320px; }
+.table-container { flex: 1; display: flex; flex-direction: column; }
+
+.form, .table-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 10px;
+  color: #374151;
+}
+
+.required::after { content: " *"; color: #dc2626; }
+
+input, textarea, select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 6px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+textarea { resize: vertical; min-height: 70px; }
+
+button {
+  padding: 8px 14px;
+  cursor: pointer;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+}
+button:hover { background: #1d4ed8; }
+button.secondary { background: #6b7280; }
+button.secondary:hover { background: #4b5563; }
+button.danger { background: #dc2626; }
+button.danger:hover { background: #b91c1c; }
+button:disabled { background: #9ca3af; cursor: not-allowed; }
+
+.form-actions { display: flex; gap: 8px; margin-top: 14px; }
+
+.error-msg {
+  color: #dc2626;
+  font-size: 13px;
+  min-height: 18px;
+  margin-top: 8px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+.toolbar input, .toolbar select {
+  margin-top: 0;
+  flex: 1;
+}
+.toolbar select { flex: 0 0 160px; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 10px 8px;
+  text-align: left;
+  font-size: 14px;
+  vertical-align: top;
+}
+th { background: #f1f5f9; font-size: 12px; text-transform: uppercase; color: #475569; }
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.badge.pending     { background: #fef3c7; color: #92400e; }
+.badge.in_progress { background: #dbeafe; color: #1e40af; }
+.badge.completed   { background: #d1fae5; color: #065f46; }
+
+.row-actions { display: flex; gap: 6px; }
+.row-actions button { padding: 4px 10px; font-size: 12px; }
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 14px;
+  font-size: 13px;
+  color: #6b7280;
+}
+.pagination { display: flex; gap: 6px; align-items: center; }
+.pagination button { padding: 4px 10px; font-size: 12px; }
+
+.editing-banner {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 8px;
+  border-radius: 5px;
+  font-size: 13px;
+  margin-bottom: 10px;
+  display: none;
+}

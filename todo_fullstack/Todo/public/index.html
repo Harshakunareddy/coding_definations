@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task Manager</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+<nav class="navbar">
+  <div class="brand">
+    <div class="logo">T</div>
+    <span>Task Manager</span>
+  </div>
+  <div class="nav-links">
+    <a href="#" class="active">Tasks</a>
+    <a href="#">Dashboard</a>
+    <a href="#">About</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- LEFT FORM -->
+  <div class="form">
+    <h3 id="form-title">Add New Task</h3>
+
+    <div id="editing-banner" class="editing-banner">
+      Editing task #<span id="editing-id"></span>
+    </div>
+
+    <form id="task-form" novalidate>
+      <input type="hidden" id="task-id" />
+
+      <label class="required" for="title">Title</label>
+      <input type="text" id="title" placeholder="required field" />
+
+      <label for="description">Description</label>
+      <textarea id="description" placeholder="optional textarea"></textarea>
+
+      <label class="required" for="status">Status</label>
+      <select id="status">
+        <option value="pending">Pending</option>
+        <option value="in_progress">In Progress</option>
+        <option value="completed">Completed</option>
+      </select>
+
+      <div id="error-msg" class="error-msg"></div>
+
+      <div class="form-actions">
+        <button type="submit" id="submit-btn">Add Task</button>
+        <button type="button" id="reset-btn" class="secondary">Reset</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- RIGHT TABLE -->
+  <div class="table-container">
+    <h3>All Tasks</h3>
+
+    <div class="toolbar">
+      <input type="text" id="search" placeholder="Search by title or description..." />
+      <select id="filter-status">
+        <option value="">All statuses</option>
+        <option value="pending">Pending</option>
+        <option value="in_progress">In Progress</option>
+        <option value="completed">Completed</option>
+      </select>
+    </div>
+
+    <table id="tasks-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tasks-tbody"></tbody>
+    </table>
+
+    <div id="empty-state" class="empty-state" style="display:none;">
+      No tasks yet. Add one using the form on the left.
+    </div>
+
+    <div class="footer">
+      <div id="count-label">Showing 0 tasks</div>
+      <div class="pagination">
+        <button id="prev-page" class="secondary">Prev</button>
+        <span id="page-info">Page 1 / 1</span>
+        <button id="next-page" class="secondary">Next</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const API = "/tasks";
+  const PAGE_SIZE = 10;
+
+  const state = {
+    page: 1,
+    totalPages: 1,
+    search: "",
+    status: "",
+    editingId: null,
+  };
+
+  const $ = (id) => document.getElementById(id);
+
+  const els = {
+    form: $("task-form"),
+    taskId: $("task-id"),
+    title: $("title"),
+    description: $("description"),
+    status: $("status"),
+    error: $("error-msg"),
+    submit: $("submit-btn"),
+    reset: $("reset-btn"),
+    formTitle: $("form-title"),
+    editingBanner: $("editing-banner"),
+    editingIdLabel: $("editing-id"),
+    search: $("search"),
+    filterStatus: $("filter-status"),
+    tbody: $("tasks-tbody"),
+    table: $("tasks-table"),
+    empty: $("empty-state"),
+    countLabel: $("count-label"),
+    prev: $("prev-page"),
+    next: $("next-page"),
+    pageInfo: $("page-info"),
+  };
+
+  function escapeHtml(s) {
+    if (s == null) return "";
+    return String(s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  function formatDate(iso) {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(d)) return "";
+    return d.toLocaleDateString() + " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function showError(msg) { els.error.textContent = msg || ""; }
+
+  async function fetchTasks() {
+    const params = new URLSearchParams({
+      page: state.page,
+      limit: PAGE_SIZE,
+    });
+    if (state.search) params.set("search", state.search);
+    if (state.status) params.set("status", state.status);
+
+    const res = await fetch(`${API}?${params}`);
+    if (!res.ok) { showError("Failed to load tasks"); return; }
+    const json = await res.json();
+    state.totalPages = json.totalPages || 1;
+    renderTable(json.data || [], json.total || 0);
+  }
+
+  function renderTable(tasks, total) {
+    els.tbody.innerHTML = "";
+
+    if (tasks.length === 0) {
+      els.table.style.display = "none";
+      els.empty.style.display = "block";
+    } else {
+      els.table.style.display = "";
+      els.empty.style.display = "none";
+
+      for (const t of tasks) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>#${t.id}</td>
+          <td>${escapeHtml(t.title)}</td>
+          <td>${escapeHtml(t.description || "—")}</td>
+          <td><span class="badge ${t.status}">${t.status.replace("_", " ")}</span></td>
+          <td>${formatDate(t.createdAt)}</td>
+          <td>
+            <div class="row-actions">
+              <button data-action="edit" data-id="${t.id}">Edit</button>
+              <button data-action="delete" data-id="${t.id}" class="danger">Del</button>
+            </div>
+          </td>
+        `;
+        els.tbody.appendChild(tr);
+      }
+    }
+
+    els.countLabel.textContent = `Showing ${tasks.length} of ${total} task${total === 1 ? "" : "s"}`;
+    els.pageInfo.textContent = `Page ${state.page} / ${state.totalPages}`;
+    els.prev.disabled = state.page <= 1;
+    els.next.disabled = state.page >= state.totalPages;
+  }
+
+  function resetForm() {
+    els.form.reset();
+    els.taskId.value = "";
+    state.editingId = null;
+    els.submit.textContent = "Add Task";
+    els.formTitle.textContent = "Add New Task";
+    els.editingBanner.style.display = "none";
+    showError("");
+  }
+
+  function startEdit(task) {
+    state.editingId = task.id;
+    els.taskId.value = task.id;
+    els.title.value = task.title || "";
+    els.description.value = task.description || "";
+    els.status.value = task.status || "pending";
+    els.submit.textContent = "Update Task";
+    els.formTitle.textContent = "Edit Task";
+    els.editingIdLabel.textContent = task.id;
+    els.editingBanner.style.display = "block";
+    els.title.focus();
+    showError("");
+  }
+
+  async function loadTaskForEdit(id) {
+    const res = await fetch(`${API}/${id}`);
+    if (!res.ok) { showError("Failed to load task"); return; }
+    const task = await res.json();
+    startEdit(task);
+  }
+
+  async function deleteTask(id) {
+    if (!confirm("Delete this task?")) return;
+    const res = await fetch(`${API}/${id}`, { method: "DELETE" });
+    if (!res.ok) { showError("Failed to delete"); return; }
+    if (state.editingId == id) resetForm();
+    await fetchTasks();
+  }
+
+  els.form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    showError("");
+
+    const title = els.title.value.trim();
+    if (!title) { showError("Title is required"); return; }
+
+    const payload = {
+      title,
+      description: els.description.value.trim(),
+      status: els.status.value,
+    };
+
+    els.submit.disabled = true;
+    try {
+      let res;
+      if (state.editingId) {
+        res = await fetch(`${API}/${state.editingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        res = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        showError(err.error || "Save failed");
+        return;
+      }
+
+      resetForm();
+      state.page = 1;
+      await fetchTasks();
+    } finally {
+      els.submit.disabled = false;
+    }
+  });
+
+  els.reset.addEventListener("click", resetForm);
+
+  els.tbody.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) return;
+    const id = btn.dataset.id;
+    if (btn.dataset.action === "edit") loadTaskForEdit(id);
+    if (btn.dataset.action === "delete") deleteTask(id);
+  });
+
+  let searchTimer;
+  els.search.addEventListener("input", () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      state.search = els.search.value.trim();
+      state.page = 1;
+      fetchTasks();
+    }, 300);
+  });
+
+  els.filterStatus.addEventListener("change", () => {
+    state.status = els.filterStatus.value;
+    state.page = 1;
+    fetchTasks();
+  });
+
+  els.prev.addEventListener("click", () => {
+    if (state.page > 1) { state.page--; fetchTasks(); }
+  });
+  els.next.addEventListener("click", () => {
+    if (state.page < state.totalPages) { state.page++; fetchTasks(); }
+  });
+
+  fetchTasks();
+</script>
+
+</body>
+</html>
