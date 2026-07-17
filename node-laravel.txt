@@ -1,0 +1,10 @@
+| Laravel                                    | Node.js (Sequelize)                                                  |
+| ------------------------------------------ | -------------------------------------------------------------------- |
+| `return response()->json(Product::all());` | `const products = await Product.findAll();`<br>`res.json(products);` |
+| `Product::create([...]);`                  | `const product = await Product.create({ name: req.body.name });`     |
+| `$product = Product::find($id);`           | `const product = await Product.findByPk(req.params.id);`             |
+| `$product->delete();`                      | `await product.destroy();`                                           |
+| `$product->update([...]);`                 | `await product.update({ name: req.body.name });`                     |
+
+
+  
