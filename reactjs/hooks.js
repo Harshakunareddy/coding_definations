@@ -1,159 +1,119 @@
-/*
-===============================
-REACT LIFECYCLE (Simple 10 Points)
-===============================
-
-1. Component is created (function runs)
-2. useState sets initial values
-3. JSX is returned (UI ready)
-4. Component renders on screen
-5. useEffect runs after render
-6. If state/props change → re-render happens
-7. useMemo/useCallback optimize performance
-8. useRef stores values without re-render
-9. Cleanup runs (component unmount / before next effect)
-10. Component removed from screen (unmount)
-
-===============================
-REAL PROJECT: TODO APP
-===============================
-*/
-
 import React, {
     useState,
     useEffect,
+    useContext,
     useRef,
     useMemo,
     useCallback,
-    useContext,
     createContext
 } from "react";
 
 /*
-  CONTEXT → used to share theme across components
+  Create a Context
+  Context is used to share data between components
+  without passing props manually
 */
-const ThemeContext = createContext();
-
-/*
-  CUSTOM HOOK → reuse logic
-  This hook handles fetching data (simulated API)
-*/
-function useFetchTodos() {
-    const [todos, setTodos] = useState([]);
-
-    useEffect(() => {
-        // simulate API call
-        const timer = setTimeout(() => {
-            setTodos([
-                { id: 1, text: "Learn React", completed: false },
-                { id: 2, text: "Build Project", completed: false }
-            ]);
-        }, 1000);
-
-        // cleanup
-        return () => clearTimeout(timer);
-    }, []);
-
-    return todos;
-}
+const MyContext = createContext();
 
 function App() {
     /*
-      STATE → store todos + input + search
+      1. useState
+      Used to store and update data in component
+      count = current value
+      setCount = function to update value
     */
-    const [input, setInput] = useState("");
-    const [search, setSearch] = useState("");
+    const [count, setCount] = useState(0);
 
     /*
-      CUSTOM HOOK usage
+      2. useEffect
+      Runs after component renders
+      Here it runs every time 'count' changes
     */
-    const todos = useFetchTodos();
+    useEffect(() => {
+        console.log("Component rendered OR count changed");
+    }, [count]); // dependency array
 
     /*
-      REF → access input directly
+      3. useRef
+      Used to access DOM elements directly
+      Also can store value without re-render
     */
     const inputRef = useRef();
 
+    // function to focus input box
     const focusInput = () => {
         inputRef.current.focus();
     };
 
     /*
-      MEMO → filter todos efficiently
+      4. useMemo
+      Used to optimize heavy calculations
+      It only recalculates when 'count' changes
     */
-    const filteredTodos = useMemo(() => {
-        console.log("Filtering...");
-        return todos.filter(todo =>
-            todo.text.toLowerCase().includes(search.toLowerCase())
-        );
-    }, [search, todos]);
+    const expensiveCalculation = useMemo(() => {
+        console.log("Calculating...");
+        return count * 10;
+    }, [count]);
 
     /*
-      CALLBACK → prevent function recreation
+      5. useCallback
+      Used to prevent function recreation
+      Helpful for performance optimization
     */
-    const addTodo = useCallback(() => {
-        if (!input) return;
-
-        todos.push({
-            id: Date.now(),
-            text: input,
-            completed: false
-        });
-
-        setInput("");
-    }, [input, todos]);
-
-    /*
-      EFFECT → log changes
-    */
-    useEffect(() => {
-        console.log("Todos updated");
-    }, [todos]);
+    const handleClick = useCallback(() => {
+        console.log("Button clicked");
+    }, []);
 
     return (
-        <ThemeContext.Provider value="dark">
+        /*
+          Providing value to all child components using Context
+        */
+        <MyContext.Provider value={"Hello from Context"}>
             <div style={{ padding: "20px" }}>
-                <h2>Todo App (All Hooks)</h2>
+                <h2>React Hooks Example</h2>
 
-                {/* INPUT */}
-                <input
-                    ref={inputRef}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Add todo"
-                />
-                <button onClick={addTodo}>Add</button>
-                <button onClick={focusInput}>Focus</button>
+                {/* useState example */}
+                <p>Count: {count}</p>
+                <button onClick={() => setCount(count + 1)}>
+                    Increment
+                </button>
 
-                {/* SEARCH */}
-                <input
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search todo"
-                />
+                {/* useEffect info */}
+                <p>Open console to see useEffect logs</p>
 
-                {/* LIST */}
-                <TodoList todos={filteredTodos} />
+                {/* useRef example */}
+                <input ref={inputRef} placeholder="Type something" />
+                <button onClick={focusInput}>
+                    Focus Input
+                </button>
+
+                {/* useMemo example */}
+                <p>Expensive Value: {expensiveCalculation}</p>
+
+                {/* useCallback example */}
+                <button onClick={handleClick}>
+                    Click Me
+                </button>
+
+                {/* useContext example */}
+                <ChildComponent />
             </div>
-        </ThemeContext.Provider>
+        </MyContext.Provider>
     );
 }
 
 /*
-  CHILD COMPONENT → uses Context
+  Child component
+  It will consume the Context value
 */
-function TodoList({ todos }) {
-    const theme = useContext(ThemeContext);
+function ChildComponent() {
+    /*
+      useContext
+      Used to access data from Context
+    */
+    const value = useContext(MyContext);
 
-    return (
-        <div>
-            <h3>Theme: {theme}</h3>
-
-            {todos.map((todo) => (
-                <p key={todo.id}>{todo.text}</p>
-            ))}
-        </div>
-    );
+    return <p>Context Value: {value}</p>;
 }
 
 export default App;
