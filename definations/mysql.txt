@@ -45,8 +45,8 @@ CREATE TABLE orders(
     id INT,
     user_id INT,
     FOREIGN KEY(user_id) REFERENCES users(id)
+    on delete cascade;
 );
-
 
 /*
 5. INSERT DATA
@@ -60,6 +60,10 @@ INSERT INTO users(id, name) VALUES(1, 'Harsha');
 Used to fetch data from table.
 */
 SELECT * FROM users;
+select name from users;
+select name , email from users;
+selct name, count (*) from users group by name having count(*) > 1;
+
 
 
 /*
@@ -74,7 +78,8 @@ SELECT * FROM users WHERE id = 1;
 Used to modify existing data.
 */
 UPDATE users SET name = 'Ravi' WHERE id = 1;
-
+update users set name = 'harsha vardhan' where id = 2;
+update users set (name, email) = ('harsha vardhan', 'harsha@gmail.com') where id = 2;
 
 /*
 9. DELETE
@@ -82,6 +87,7 @@ Used to remove records from table.
 */
 DELETE FROM users WHERE id = 1;
 
+delete from orders where email = 2 and user_id = 2 and price > 100;
 
 /*
 10. LIMIT
@@ -96,6 +102,8 @@ Used to sort results.
 ASC → ascending, DESC → descending.
 */
 SELECT * FROM users ORDER BY name ASC;
+select * from users order by id desc;
+
 
 
 /*
@@ -144,6 +152,27 @@ Speeds up searching operations.
 But increases storage.
 */
 CREATE INDEX idx_name ON users(name);
+create index idx_name on users(name);
+select * from users where name like 'harsha';
+select * from users where name like '%hars%';
+select * from users where name like '_h%';
+select * from users where name like '%h_%';
+select * from users where name like '%h_r%;
+select * from users where name not like 'harsha';
+
+
+select * from users where name = 'harsha' or id = 10;
+
+select * from users where name, id in ('harsha', 10); // wrong one 
+
+
+select * from employees where role = 'dev' or role = 'tester' or role = 'hr';
+select * from employees where role IN('dev', 'tester', 'hr');
+
+select * from employees where age between 40 and 50;
+
+select distinct name from employees;
+select min(salary) from employees;
 
 
 /*
@@ -173,6 +202,9 @@ Used for security and simplicity.
 CREATE VIEW user_view AS
 SELECT name FROM users;
 
+create view view_name as select * from users;
+then use like this => select * from view_name; 
+
 
 /*
 20. STORED PROCEDURE
@@ -192,3 +224,68 @@ DELIMITER;
 END OF FILE
 ========================================
 */
+
+
+
+delimeter //
+create procedure GetUser()
+BEGIN
+    select * from usersl
+END //
+
+CALL GetUser();
+
+
+select SUM(salary) from employees;
+avg, max, min 
+is null 
+is not NULL
+
+SELECT
+COALESCE(phone,'No Phone')
+FROM users;
+
+
+
+1. Find Duplicate Emails
+select email, count(*) from users group by email having count(*) > 1;
+
+2. Second max salary in the employees
+select MAX(salary) from employees 
+    where MAX(salary) < select max(salary) from employees;
+
+3. Show customers who have never placed an order.
+    select u.* from users u
+        left join orders o 
+        on u.id = o.user_id
+        where o.user_id IS NULL;
+
+4. Calculate the total salary department-wise.
+    select *, sum(salary) from employees group by department;
+
+5. top 3 high paid employees
+    select * from employees order by salary desc limit 3;
+
+6. Find Employees Earning More Than the Average Salary
+    select * from employees
+        where salary > select *, avg(salary) from employees;
+
+7. Count Employees in Each Department 
+    select department,count(*) from employees group by department;
+
+8. Find Employees Whose Name Starts with 'A'
+    select * from employees where name like 'A%';
+
+9. Find the Highest Salary in Each Department
+    select *, max(salary) from employees group by department;
+
+10. Find Employees Who Joined in 2025
+    select * from employees where year(created_at) = 2025;
+    select distinct department from employees;
+
+
+
+mon => mysql 
+tue => react js 
+wed => node js 
+
