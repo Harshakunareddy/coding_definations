@@ -8,3 +8,69 @@
 
 
   
+
+| MySQL (Sequelize)   | MongoDB (Mongoose)                                |
+| ------------------- | ------------------------------------------------- |
+| `Task.findAll()`    | `Task.find()`                                     |
+| `Task.findByPk(id)` | `Task.findById(id)`                               |
+| `Task.create(data)` | `Task.create(data)`                               |
+| `task.update(data)` | `Task.findByIdAndUpdate(id, data, { new: true })` |
+| `task.destroy()`    | `Task.findByIdAndDelete(id)`                      |
+
+app.get("/route", async (req, res) => {
+    try {
+
+        const data = await Model.XXXX();   // <-- Change only this line
+
+        return res.status(200).json({
+            success: true,
+            data
+        });
+
+    } catch (err) {
+
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    }
+});
+
+
+
+
+| Operation           | MySQL (Sequelize)                                                                 | PostgreSQL (Sequelize)                                                            | MongoDB (Mongoose)                                              |
+| ------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Get All             | `Task.findAll()`                                                                  | `Task.findAll()`                                                                  | `Task.find()`                                                   |
+| Get One by ID       | `Task.findByPk(id)`                                                               | `Task.findByPk(id)`                                                               | `Task.findById(id)`                                             |
+| Create              | `Task.create(data)`                                                               | `Task.create(data)`                                                               | `Task.create(data)`                                             |
+| Update by ID        | `task.update(data)`                                                               | `task.update(data)`                                                               | `Task.findByIdAndUpdate(id, data, { new: true })`               |
+| Delete by ID        | `task.destroy()`                                                                  | `task.destroy()`                                                                  | `Task.findByIdAndDelete(id)`                                    |
+| Find One            | `Task.findOne({ where: { title: "Test" } })`                                      | `Task.findOne({ where: { title: "Test" } })`                                      | `Task.findOne({ title: "Test" })`                               |
+| Find with Condition | `Task.findAll({ where: { status: "pending" } })`                                  | `Task.findAll({ where: { status: "pending" } })`                                  | `Task.find({ status: "pending" })`                              |
+| Count               | `Task.count()`                                                                    | `Task.count()`                                                                    | `Task.countDocuments()`                                         |
+| Select Columns      | `Task.findAll({ attributes: ["title","status"] })`                                | `Task.findAll({ attributes: ["title","status"] })`                                | `Task.find({}, "title status")`                                 |
+| Sort ASC            | `Task.findAll({ order: [["title","ASC"]] })`                                      | `Task.findAll({ order: [["title","ASC"]] })`                                      | `Task.find().sort({ title: 1 })`                                |
+| Sort DESC           | `Task.findAll({ order: [["createdAt","DESC"]] })`                                 | `Task.findAll({ order: [["createdAt","DESC"]] })`                                 | `Task.find().sort({ createdAt: -1 })`                           |
+| Limit               | `Task.findAll({ limit: 5 })`                                                      | `Task.findAll({ limit: 5 })`                                                      | `Task.find().limit(5)`                                          |
+| Pagination          | `Task.findAll({ limit: 10, offset: 20 })`                                         | `Task.findAll({ limit: 10, offset: 20 })`                                         | `Task.find().skip(20).limit(10)`                                |
+| LIKE Search         | `Task.findAll({ where: { title: { [Op.like]: "%node%" } } })`                     | `Task.findAll({ where: { title: { [Op.like]: "%node%" } } })`                     | `Task.find({ title: { $regex: "node", $options: "i" } })`       |
+| Equal               | `Task.findAll({ where: { status: "pending" } })`                                  | `Task.findAll({ where: { status: "pending" } })`                                  | `Task.find({ status: "pending" })`                              |
+| Not Equal           | `Task.findAll({ where: { status: { [Op.ne]: "completed" } } })`                   | `Task.findAll({ where: { status: { [Op.ne]: "completed" } } })`                   | `Task.find({ status: { $ne: "completed" } })`                   |
+| Greater Than        | `Task.findAll({ where: { id: { [Op.gt]: 5 } } })`                                 | `Task.findAll({ where: { id: { [Op.gt]: 5 } } })`                                 | `Task.find({ age: { $gt: 5 } })`                                |
+| Less Than           | `Task.findAll({ where: { id: { [Op.lt]: 5 } } })`                                 | `Task.findAll({ where: { id: { [Op.lt]: 5 } } })`                                 | `Task.find({ age: { $lt: 5 } })`                                |
+| Between             | `Task.findAll({ where: { id: { [Op.between]: [1,10] } } })`                       | `Task.findAll({ where: { id: { [Op.between]: [1,10] } } })`                       | `Task.find({ age: { $gte: 1, $lte: 10 } })`                     |
+| IN                  | `Task.findAll({ where: { status: { [Op.in]: ["pending","completed"] } } })`       | `Task.findAll({ where: { status: { [Op.in]: ["pending","completed"] } } })`       | `Task.find({ status: { $in: ["pending","completed"] } })`       |
+| NOT IN              | `Task.findAll({ where: { status: { [Op.notIn]: ["completed"] } } })`              | `Task.findAll({ where: { status: { [Op.notIn]: ["completed"] } } })`              | `Task.find({ status: { $nin: ["completed"] } })`                |
+| OR Condition        | `Task.findAll({ where: { [Op.or]: [{status:"pending"},{status:"completed"}] } })` | `Task.findAll({ where: { [Op.or]: [{status:"pending"},{status:"completed"}] } })` | `Task.find({ $or: [{status:"pending"},{status:"completed"}] })` |
+| AND Condition       | `Task.findAll({ where: { title:"Node", status:"pending" } })`                     | `Task.findAll({ where: { title:"Node", status:"pending" } })`                     | `Task.find({ title:"Node", status:"pending" })`                 |
+| Update Multiple     | `Task.update({ status:"completed" }, { where:{ status:"pending" } })`             | `Task.update({ status:"completed" }, { where:{ status:"pending" } })`             | `Task.updateMany({ status:"pending" }, { status:"completed" })` |
+| Delete Multiple     | `Task.destroy({ where:{ status:"completed" } })`                                  | `Task.destroy({ where:{ status:"completed" } })`                                  | `Task.deleteMany({ status:"completed" })`                       |
+| Latest Record       | `Task.findOne({ order:[["createdAt","DESC"]] })`                                  | `Task.findOne({ order:[["createdAt","DESC"]] })`                                  | `Task.findOne().sort({ createdAt:-1 })`                         |
+| Oldest Record       | `Task.findOne({ order:[["createdAt","ASC"]] })`                                   | `Task.findOne({ order:[["createdAt","ASC"]] })`                                   | `Task.findOne().sort({ createdAt:1 })`                          |
+| Join / Relation     | `Task.findAll({ include:[User] })`                                                | `Task.findAll({ include:[User] })`                                                | `Task.find().populate("user")`                                  |
+| Exists Check        | `Task.findByPk(id)`                                                               | `Task.findByPk(id)`                                                               | `Task.exists({ _id: id })`                                      |
+| Bulk Create         | `Task.bulkCreate(data)`                                                           | `Task.bulkCreate(data)`                                                           | `Task.insertMany(data)`                                         |
+| Increment Field     | `task.increment("views")`                                                         | `task.increment("views")`                                                         | `Task.updateOne({ _id:id }, { $inc:{ views:1 } })`              |
+| Transaction         | `sequelize.transaction()`                                                         | `sequelize.transaction()`                                                         | `mongoose.startSession()`                                       |

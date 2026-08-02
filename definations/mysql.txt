@@ -283,9 +283,53 @@ select MAX(salary) from employees
     select * from employees where year(created_at) = 2025;
     select distinct department from employees;
 
+11. Find the Third Highest Salary
+    select * from employees;
+    select max(salary) as top_1_salary from enployees
+        where top_1_salary < (
+            select max(salary) as top_2_salary from employees
+        ) 
+        where top_2_salary < (
+            select max(salary) as from employees
+        ); 
+
+    select salary from employees order by salary DESC limit 1 offset 2;
+    select distinct salary from employees order by salary DESC limit 1 offset 2;
+
+12. Find Employees with Salary Between 30000 and 60000
+    select * from employees where salary between 30000 and 60000
+
+13. Find Employees Who Don't Have a Manager
+    select * from employees where manager_id IS null;
 
 
-mon => mysql 
-tue => react js 
-wed => node js 
+14. Find Customers Who Placed More Than 5 Orders
+    select user_id, count(*) from orders group by user_id having count(*) > 5;
 
+
+15. Find Total Number of Orders for Each Customer
+    select user_id, count(*) from orders group by user_id;
+
+
+16. Find Employees Who Earn the Same Salary
+    select salary, count(*) from employees group by salary having count(*) > 1;
+    select salary, count(*) from employees group by salary having count(*) > 1;
+
+17. find the latest employee Joined
+    select * from employees order by id desc limit 1;
+    select * from employees order by created_at limit 1;
+
+18. Find all employees sorted by Name
+    select * from employees order by name ASC;
+    select * from employees order by name DESC;
+
+19. find departments having more than 2 Employees
+    select dep_id, count(*) from employees group by dep_id having count(*) > 2;
+
+20. find employees whose salary is less than dept avg
+    select * from employees e
+        where salary < (
+            select avg(salary)
+            from employees
+            where dep_id = e.dep_id
+        );

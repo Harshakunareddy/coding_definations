@@ -1,199 +1,113 @@
-/*
-========================================
-FULL EXAMPLE (INTERVIEW READY)
-========================================
+import React, {useState, useEffect} from "react";
 
-FEATURES:
-1. CRUD → add, edit, delete names
-2. Pagination → show limited items per page
-3. Debounce Search → delay search input
-4. Clean and simple logic
 
-========================================
-IMPORTANT CONCEPTS
-========================================
 
-- useState → store data
-- useEffect → handle debounce
-- slice() → pagination
-- map() → render list
-*/
+const Crud = () => {
+    const [names, SetNames] = useState([]);
+    const [name, SetName] = useState("");
+    const [editIndex, SetEditIndex] = useState(null);
+    const [searchTerm, SetSearchTerm] = useState("");
+    const [debounceTerm, SetDebounceTerm] = useState("");
 
-import React, { useState, useEffect } from "react";
+    const [currentPage, SetCurrentPage] = useState(1);
 
-function App() {
-    /*
-    ============================
-    STATE
-    ============================
-    */
-    const [names, setNames] = useState([
-        "Harsha",
-        "Ravi",
-        "Kiran",
-        "Suresh",
-        "Anil",
-        "Vikram",
-        "Teja",
-        "Rohit"
-    ]);
 
-    const [input, setInput] = useState("");
-    const [editIndex, setEditIndex] = useState(null);
-
-    const [search, setSearch] = useState("");
-    const [debouncedSearch, setDebouncedSearch] = useState("");
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 3;
-
-    /*
-    ============================
-    DEBOUNCE LOGIC
-    ============================
-  
-    Wait 500ms before updating search
-    This avoids too many re-renders
-    */
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedSearch(search);
-        }, 500);
-
-        // cleanup → runs before next effect
-        return () => clearTimeout(timer);
-    }, [search]);
-
-    /*
-    ============================
-    FILTER DATA (SEARCH)
-    ============================
-    */
-    const filteredNames = names.filter((name) =>
-        name.toLowerCase().includes(debouncedSearch.toLowerCase())
-    );
-
-    /*
-    ============================
-    PAGINATION LOGIC
-    ============================
-    */
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentItems = filteredNames.slice(
-        startIndex,
-        startIndex + itemsPerPage
-    );
-
-    const totalPages = Math.ceil(filteredNames.length / itemsPerPage);
-
-    /*
-    ============================
-    ADD / UPDATE
-    ============================
-    */
-    const handleAddOrUpdate = () => {
-        if (!input) return;
-
-        if (editIndex !== null) {
-            // UPDATE
-            const updated = [...names];
-            updated[editIndex] = input;
-            setNames(updated);
-            setEditIndex(null);
-        } else {
-            // ADD
-            setNames([...names, input]);
+    const handleChange = (e) => {
+        SetName(e.target.value);
+    }
+    const handleSubmit = () => {
+        if(editIndex !== null){
+            let a = [...names];
+            a[editIndex] = name;
+            SetEditIndex(null);
+            SetName("");
+            SetNames(a);
         }
+        else{
+            if(!name.trim()) return;
+            SetNames([...names, name]);
+            SetName("");
+        }
+    }
 
-        setInput("");
-    };
+    const handleEdit = (i) => {
+        SetName(names[i]);
+        SetEditIndex(i);
+    }
 
-    /*
-    ============================
-    EDIT
-    ============================
-    */
-    const handleEdit = (index) => {
-        setInput(names[index]);
-        setEditIndex(index);
-    };
+    const handleDelete = (i) => {
+        let updatedNames = names.filter((name,key) => i !== key);
+        SetNames(updatedNames);
+    }
 
-    /*
-    ============================
-    DELETE
-    ============================
-    */
-    const handleDelete = (index) => {
-        const updated = names.filter((_, i) => i !== index);
-        setNames(updated);
-    };
+    
+
+    const filteredNames = names.filter((name,key) =>
+        name.toLowerCase().includes(debounceTerm.toLowerCase())
+    );
+
+    let perPage = 5;
+
+
+    let startIndex = (currentPage - 1) * perPage;
+    let endIndex = startIndex + perPage;
+    const paginatedNames = filteredNames.slice(startIndex, endIndex);
+
+    // const totalPages = Math.ceil(filteredNames.length / perPage);
+    const totalPages = Math.max(1, Math.ceil(filteredNames.length / perPage));
+    
+
+
+    useEffect(()=>(
+        const timer = setTimeout(() => {
+            SetDebounceTerm(searchTerm);
+        }, 3000);
+        return () => clearTimeout(timer);
+    ),[searchTerm]);
+
+    useEffect(() => {
+        SetCurrentPage(1);
+    }, [debounceTerm]);
 
     return (
-        <div style={{ padding: "20px" }}>
-            <h2>CRUD + Pagination + Debounce</h2>
-
-            {/* ADD / EDIT INPUT */}
-            <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Enter name"
-            />
-            <button onClick={handleAddOrUpdate}>
-                {editIndex !== null ? "Update" : "Add"}
-            </button>
-
-            {/* SEARCH INPUT */}
-            <br /><br />
-            <input
-                value={search}
-                onChange={(e) => {
-                    setSearch(e.target.value);
-                    setCurrentPage(1); // reset page on search
-                }}
-                placeholder="Search..."
-            />
-
-            {/* LIST */}
-            <ul>
-                {currentItems.map((name, index) => (
-                    <li key={index}>
-                        {name}
-
-                        {/* EDIT */}
-                        <button onClick={() => handleEdit(index)}>
-                            Edit
-                        </button>
-
-                        {/* DELETE */}
-                        <button onClick={() => handleDelete(index)}>
-                            Delete
-                        </button>
-                    </li>
-                ))}
-            </ul>
-
-            {/* PAGINATION */}
+        <>
             <div>
-                <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                >
-                    Prev
-                </button>
-
-                <span> Page {currentPage} / {totalPages} </span>
-
-                <button
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                >
-                    Next
+                <input 
+                    type="text"
+                    placeholder="Search Name"
+                    value={searchTerm || ""}
+                    onChange={(e) => SetSearchTerm(e.target.value)}  
+                />
+            </div>
+            <div>
+                <input 
+                    value={name || ""}
+                    onChange={handleChange}
+                    type="text" placeholder="Enter Name" />
+                {/* <button onClick={() => handleSubmit()}>Add</button> */}
+                <button onClick={() => handleSubmit()}>
+                    {editIndex !== null ? "Update" : "Add"}
                 </button>
             </div>
-        </div>
-    );
+            {paginatedNames.map((name,i)=>(
+                <div key={startIndex + i}>
+                    <li>{name}</li>
+                    <button onClick={()=>handleEdit(startIndex + i)}>Edit</button>
+                    <button onClick={()=>handleDelete(startIndex + i)}>Delete</button>
+                </div>
+            ))}
+
+            <div align="right">
+                <button disabled={currentPage == 1} onClick={()=>SetCurrentPage((prev) => prev - 1)}>Prev</button>
+                <button>Page {currentPage} of {totalPages}</button>
+                <button disabled={totalPages == currentPage} onClick={()=>SetCurrentPage((prev) => prev + 1)}>Next</button>
+            </div>
+
+            <div>
+                Total Records: {filteredNames.length}
+            </div>
+        </>
+    )
 }
 
-
-
-export default App;
+export default Crud;

@@ -18,3 +18,46 @@ const Task = sequelize.define("Task", {
 });
 
 module.exports = Task;
+
+
+// User.hasMany(Task, {
+//   foreignKey: "userId",
+// });
+
+// Task.belongsTo(User, {
+//   foreignKey: "userId",
+// });
+
+
+// Student.belongsToMany(Course, {
+//     through: "StudentCourses"
+// });
+
+
+// Get User with Tasks
+// const users = await User.findAll({
+//     include: [Task]
+// });
+
+// Get Task with User
+// const tasks = await Task.findAll({
+//     include: [User]
+// });
+
+
+
+
+
+| Sequelize             | Mongoose                        |
+| --------------------- | ------------------------------- |
+| `DataTypes.STRING`    | `String`                        |
+| `DataTypes.TEXT`      | `String`                        |
+| `DataTypes.INTEGER`   | `Number`                        |
+| `DataTypes.FLOAT`     | `Number`                        |
+| `DataTypes.DOUBLE`    | `Number`                        |
+| `DataTypes.DECIMAL`   | `Number`                        |
+| `DataTypes.BOOLEAN`   | `Boolean`                       |
+| `DataTypes.DATE`      | `Date`                          |
+| `DataTypes.JSON`      | `Object` / `Schema.Types.Mixed` |
+| `DataTypes.UUID`      | `String`                        |
+| `DataTypes.ENUM(...)` | `String` with `enum: [...]`     |
