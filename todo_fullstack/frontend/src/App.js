@@ -1,273 +1,229 @@
-import React, { useState, useEffect, useCallback } from "react";
-import "./App.css";
+import { Container, Row, Col, Button, Card, Form, Navbar, 
+    Nav, Alert, Modal , Table, Badge, Spinner } from 'react-bootstrap';
 
-const API = "http://localhost:5000";
+const App = () => {
 
-function App() {
-  const [tab, setTab] = useState("tasks");
+    const users = [
+        { id: 1, name: 'John', email: 'john@email.com', status: 'Active' },
+        { id: 2, name: 'Sarah', email: 'sarah@email.com', status: 'Inactive' },
+        { id: 3, name: 'Mike', email: 'mike@email.com', status: 'Active' },
+        { id: 4, name: 'Lisa', email: 'lisa@email.com', status: 'Pending' },
+    ];
 
-  const [tasks, setTasks] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const limit = 5;
 
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+    return (
+        <>
+            <Container>
+                <h1>Hello</h1>
+                <p>This is centered and responsive</p>
+            </Container>
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("pending");
-  const [editingId, setEditingId] = useState(null);
-  const [err, setErr] = useState("");
+            <Container>
+                <Row>
+                    <Col style={{  background:'lightblue', padding:'10px' }}>One</Col>
+                    <Col style={{  background:'lightgreen', padding:'10px' }}>Two</Col>
+                    <Col style={{  background:'lightyellow', padding:'10px' }}>Three</Col>
+                </Row>
 
-  const loadTasks = useCallback(async () => {
-    try {
-      const params = new URLSearchParams();
-      params.append("page", page);
-      params.append("limit", limit);
-      if (search) params.append("search", search);
-      if (statusFilter) params.append("status", statusFilter);
+                <Row className='mt-3'>
+                    <Col xs={12} md={8} lg={8}>8/12</Col>
+                    <Col md={4}>4/12</Col>
+                </Row>
+            </Container>
 
-      const res = await fetch(`${API}/tasks?${params.toString()}`);
-      const data = await res.json();
-      setTasks(data.data || []);
-      setTotal(data.total || 0);
-      setTotalPages(data.totalPages || 1);
-    } catch (e) {
-      setErr("Failed to load tasks");
-    }
-  }, [page, search, statusFilter]);
+            <Container className='mt-4'>
+                <Row className='mb-3'>
+                    <h1>Solid Buttons</h1>
+                    <Col>
+                        <Button variant='primary'>Primary</Button>
+                        <Button variant='success'>success</Button>
+                        <Button variant='danger'>danger</Button>
+                        <Button variant='warning'>warning</Button>
+                        <Button variant='info'>info</Button>
+                        <Button variant='dark'>dark</Button>
+                    </Col>
+                </Row>
 
-  useEffect(() => {
-    loadTasks();
-  }, [loadTasks]);
+                <Row className='mb-3'>
+                    <h1>Outline Buttons</h1>
+                    <Col>
+                        <Button variant='outline-primary'>Primary</Button>{' '}
+                        <Button variant='outline-danger'>Danger</Button>{' '}
+                        <Button variant='outline-success'>Success</Button>
+                    </Col>
+                </Row>
+                
+                <Row className='mb-3'>
+                    <h1>Button Sizes</h1>
+                    <Col>
+                        <Button variant='primary' size='sm'>Small</Button>{'  '}
+                        <Button variant='primary'>Normal</Button>{'  '}
+                        <Button variant='primary' size='lg'>Small</Button>{'  '}
+                    </Col>
+                </Row>
 
-  useEffect(() => {
-    const t = setTimeout(() => setPage(1), 300);
-    return () => clearTimeout(t);
-  }, [search, statusFilter]);
+                <Row>
+                    <h1>Disabled and block</h1>
+                    <Col>
+                        <Button variant='primary' disabled>Disabled Btn</Button>{'  '}
+                        <Button variant='success' className='w-100 mt-2'>Disabled Btn</Button>
+                    </Col>
+                </Row>
+            </Container>
 
-  const resetForm = () => {
-    setTitle("");
-    setDescription("");
-    setStatus("pending");
-    setEditingId(null);
-    setErr("");
-  };
+            <Container>
+                <h1>Cards</h1>
+                <Row>
+                    <Col>
+                        <Card>
+                            <Card.Body>
+                                <Card.Title>Card Title</Card.Title>
+                                <Card.Text>This is a simple Card</Card.Text>
+                            </Card.Body>
+                        </Card>
+                    </Col>
 
-  const submit = async (e) => {
-    e.preventDefault();
-    if (!title.trim()) {
-      setErr("Title is required");
-      return;
-    }
-    const body = { title, description, status };
-    try {
-      let res;
-      if (editingId) {
-        res = await fetch(`${API}/tasks/${editingId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-      } else {
-        res = await fetch(`${API}/tasks`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-      }
-      if (!res.ok) {
-        const d = await res.json();
-        setErr(d.error || "Save failed");
-        return;
-      }
-      resetForm();
-      loadTasks();
-    } catch (e2) {
-      setErr("Network error");
-    }
-  };
+                    <Col xs={12} md={4} className='mb-4'>
+                        <Card bg="dark" text='white'>
+                            <Card.Header>Card Header</Card.Header>
+                            <Card.Body>
+                                <Card.Title>Card Title</Card.Title>
+                                <Card.Text>This is a simple Card</Card.Text>    
+                            </Card.Body>
+                            <Card.Footer>Card Footer</Card.Footer>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
 
-  const startEdit = (t) => {
-    setEditingId(t.id);
-    setTitle(t.title);
-    setDescription(t.description || "");
-    setStatus(t.status);
-  };
 
-  const remove = async (id) => {
-    if (!window.confirm("Delete this task?")) return;
-    await fetch(`${API}/tasks/${id}`, { method: "DELETE" });
-    loadTasks();
-  };
+            <Container className='mt-4'>
+                <h1>Forms in React bootstrap</h1>
+                <Row>
+                    <Col xs={12} md={6} className='mb-3'>
+                        <Card>
+                            <Card.Body>
+                                <Card.Title>Login Form</Card.Title>
+                                <Form>
+                                    <Form.Group className='mb-3'>
+                                        <Form.Label>Email : </Form.Label>
+                                        <Form.Control type='email' placeholder='Enter Email' />
+                                    </Form.Group>
 
-  const counts = {
-    pending: tasks.filter((t) => t.status === "pending").length,
-    in_progress: tasks.filter((t) => t.status === "in_progress").length,
-    completed: tasks.filter((t) => t.status === "completed").length,
-  };
+                                    <Form.Group className='mb-3'>
+                                        <Form.Label>Password : </Form.Label>
+                                        <Form.Control type='password' placeholder='Enter Password' />
+                                    </Form.Group>
 
-  return (
-    <div className="wrap">
-      <header className="topbar">
-        <div className="brand">
-          <span className="logo">T</span>
-          <span className="brand-name">Task Manager</span>
-        </div>
-        <nav className="nav">
-          <button
-            className={tab === "tasks" ? "nav-btn active" : "nav-btn"}
-            onClick={() => setTab("tasks")}
-          >
-            Tasks
-          </button>
-          <button
-            className={tab === "dashboard" ? "nav-btn active" : "nav-btn"}
-            onClick={() => setTab("dashboard")}
-          >
-            Dashboard
-          </button>
-          <button
-            className={tab === "about" ? "nav-btn active" : "nav-btn"}
-            onClick={() => setTab("about")}
-          >
-            About
-          </button>
-        </nav>
-      </header>
+                                    <Form.Group>
+                                        <Form.Check type='checkbox' label="Remember Password" />
+                                        <Form.Check type='radio' label="Radio" name='gender' />
+                                        <Form.Check type='radio' label="Femake" name='gender' />
+                                    </Form.Group>
+                                    
+                                    <Button variant='primary'>Login</Button>
+                                </Form>
 
-      <main className="main">
-        {tab === "tasks" && (
-          <div className="grid">
-            <section className="card form-card">
-              <h2>{editingId ? "Edit Task" : "Add New Task"}</h2>
-              <form onSubmit={submit}>
-                <label>Title <span className="req">*</span></label>
-                <input
-                  type="text"
-                  placeholder="required field"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
+                                <Form>
+                                    <Form.Group>
+                                        <Form.Label>Select Dropdown</Form.Label>
+                                        <Form.Select>
+                                            <option>Select Country</option>
+                                            <option>India</option>
+                                            <option>China</option>
+                                            <option>Nepal</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Form>
 
-                <label>Description</label>
-                <textarea
-                  placeholder="optional textarea"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
+                                <Form.Control as='textarea' rows={3} placeholder='Type Here' />
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
 
-                <label>Status <span className="req">*</span></label>
-                <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                  <option value="pending">Pending</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                </select>
 
-                {err && <p className="err">{err}</p>}
+            <Container>
+                <Navbar bg='dark' variant='dark' expand='md' sticky='top'>
+                    <Navbar.Brand href="#">Brand Name</Navbar.Brand>
+                    <Navbar.Toggle aria-controls='basic-navbar' />
+                    <Navbar.Collapse>
+                        <Nav>
+                            <Nav.Link href='#'>Home</Nav.Link>
+                            <Nav.Link href='#'>About</Nav.Link>
+                            <Nav.Link href='#'>Contact</Nav.Link>
+                        </Nav>
+                        <Button variant='outline-light'>Login</Button>
+                    </Navbar.Collapse>
+                </Navbar>
+            </Container>
 
-                <div className="btn-row">
-                  <button type="submit" className="btn-primary">
-                    {editingId ? "Update" : "Add Task"}
-                  </button>
-                  <button type="button" className="btn-secondary" onClick={resetForm}>
-                    Reset
-                  </button>
-                </div>
-              </form>
-            </section>
+            <Container className='mt-6'>
+                <h1>Alerts</h1>
+                <Alert variant='success'>Sucess Alert!</Alert>
+                <Alert variant='danger'>Danger Alert!</Alert>
+                <Alert variant='warning'>Warning Alert!</Alert>
+                <Alert variant='info'>Info Alert!</Alert>
 
-            <section className="card list-card">
-              <h2>All Tasks</h2>
-              <div className="filters">
-                <input
-                  type="text"
-                  className="search"
-                  placeholder="Search by title or description..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <option value="">All statuses</option>
-                  <option value="pending">Pending</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                </select>
-              </div>
+                <Alert variant='primary'>
+                    <Alert.Heading>Well Done!</Alert.Heading>
+                    <Alert.Link href='#'>LogOut</Alert.Link>
+                    <p className='mb-0'>Hmm Nice Bro!!!!!</p>
+                </Alert>
 
-              {tasks.length === 0 ? (
-                <div className="empty">
-                  No tasks yet. Add one using the form on the left.
-                </div>
-              ) : (
-                <ul className="task-list">
-                  {tasks.map((t) => (
-                    <li key={t.id} className="task-item">
-                      <div className="task-main">
-                        <div className="task-title">{t.title}</div>
-                        {t.description && (
-                          <div className="task-desc">{t.description}</div>
-                        )}
-                        <span className={`badge ${t.status}`}>
-                          {t.status.replace("_", " ")}
-                        </span>
-                      </div>
-                      <div className="task-actions">
-                        <button onClick={() => startEdit(t)}>Edit</button>
-                        <button className="danger" onClick={() => remove(t.id)}>
-                          Delete
-                        </button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                {/* <Alert dismissible onClose={() => setShow(false)}>
+                    X Btn press for closing the alert
+                </Alert> */}
+            </Container>
 
-              <div className="footer-row">
-                <span>Showing {tasks.length} of {total} tasks</span>
-                <div className="pager">
-                  <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-                    Prev
-                  </button>
-                  <span>Page {page} / {totalPages}</span>
-                  <button
-                    disabled={page >= totalPages}
-                    onClick={() => setPage((p) => p + 1)}
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            </section>
-          </div>
-        )}
 
-        {tab === "dashboard" && (
-          <div className="card">
-            <h2>Dashboard</h2>
-            <p>Total tasks on this page: {tasks.length}</p>
-            <ul>
-              <li>Pending: {counts.pending}</li>
-              <li>In Progress: {counts.in_progress}</li>
-              <li>Completed: {counts.completed}</li>
-            </ul>
-          </div>
-        )}
+            <Container>
+                <Modal show={show} onHide={() => setShow(true)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Delete Item</Modal.Title>
+                    </Modal.Header>
 
-        {tab === "about" && (
-          <div className="card">
-            <h2>About</h2>
-            <p>Simple Task Manager. React frontend + Express/Sequelize backend.</p>
-          </div>
-        )}
-      </main>
-    </div>
-  );
+                    <Modal.Body>Hello Namaste Bossu!!</Modal.Body>
+
+                    <Modal.Footer>
+                        <Button onClick={() => setShow(true)}>Cancel</Button>
+                        <Button onClick={() => setShow(true)}>Delete</Button>
+                    </Modal.Footer>
+                </Modal>
+            </Container>
+
+            <Container className='mt-4'>
+                <Table striped bordered hover responsive>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {users.map((user) => (
+                            <tr key={user.id}>
+                                <td>{user.name}</td>
+                                <td>{user.email}</td>
+                                {/* <td>{user.Status}</td> */}
+                                <td>
+                                    <Badge bg={
+                                        user.status === 'Active' ? 'success' : user.status === 'Inavtive' ? 'danger' : 'warning'
+                                    }>
+                                        {user.status}
+                                    </Badge>
+                                </td>
+
+                            </tr>
+                        ))}
+                    </tbody>
+                </Table>
+            </Container>
+        </>
+    )
 }
 
 export default App;
