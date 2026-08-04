@@ -1,5 +1,9 @@
 import { Container, Row, Col, Button, Card, Form, Navbar, 
-    Nav, Alert, Modal , Table, Badge, Spinner } from 'react-bootstrap';
+    Nav, Alert, Modal , 
+    Pagination,
+    Table, Badge, Spinner, Accordion, Toast, ToastContainer } from 'react-bootstrap';
+
+import { useState } from 'react';
 
 const App = () => {
 
@@ -10,6 +14,15 @@ const App = () => {
         { id: 4, name: 'Lisa', email: 'lisa@email.com', status: 'Pending' },
     ];
 
+    const [loading, setLoading] = useState(false);
+    const [show, setShow] = useState(false);
+    const [showSuccess, setSuccess] = useState(false);
+
+
+    const handleClick = () => {
+        setLoading(true);
+        setTimeout(()=>setLoading(false),2000);
+    }
 
     return (
         <>
@@ -222,6 +235,170 @@ const App = () => {
                     </tbody>
                 </Table>
             </Container>
+
+            <Container>
+                <Badge pill bg='success' className='me-2'>Active</Badge>
+                <Badge pill bg='danger' className='me-2'>Deleted</Badge>
+                <Badge pill bg='warning' className='me-2'>Pending</Badge>
+                <Badge pill bg='info' className='me-2'>New</Badge>
+            </Container>
+
+            
+            <Container>
+                <Spinner animation='border' variant='primary' className='me-2' />
+                <Spinner animation='border' variant='success' className='me-2' />
+                <Spinner animation='border' variant='danger' className='me-2' />
+                <Spinner animation='border' variant='warning' className='me-2' />
+                <Spinner animation='border' variant='info' className='me-2' />
+
+                {/* small spinner */}
+                <Spinner animation='border' size='sm' className='me-2' />
+            </Container>
+
+            <Container>
+                <Accordion defaultActiveKey="0">
+                    <Accordion.Item eventKey='0'>
+                        <Accordion.Header>What is React?</Accordion.Header>
+                        <Accordion.Body>
+                            React is a js library
+                        </Accordion.Body>
+                    </Accordion.Item>
+                    <Accordion.Item eventKey='1'>
+                        <Accordion.Header>What is React 2 ?</Accordion.Header>
+                        <Accordion.Body>
+                            React is a js 2 library
+                        </Accordion.Body>
+                    </Accordion.Item>
+                
+                </Accordion>
+
+                {/* <Accordion alwaysOpen></Accordion>  many open at a time*/} 
+
+                  
+                {/* Flush style - no borders, flat look
+                <h4 className="mt-4">Flush Style (no borders)</h4>
+                <Accordion flush></Accordion> */}
+
+                <ToastContainer position='top-end' className='p-3'>
+                    <Toast show={showSuccess} autohide delay={3000} bg='success'>
+                        {/* bg="danger" */}
+                        {/* bg="info" */}
+                        <Toast.Header>
+                            <strong>Success</strong>
+                            <small>Just now</small>
+                        </Toast.Header>
+                        <Toast.Body>Item saved successfully!</Toast.Body>
+                    </Toast>
+                </ToastContainer>
+                
+            </Container>
+
+
+            {/* <Container>
+                <h1>pagination concept</h1>
+                <Pagination>
+                    <Pagination.First disabled={currentPage === 1} />
+                    <Pagination.Prev disabled={currentPage === 1} />
+                    <Pagination.Item
+                        key={index + 1}
+                        active="some js"
+                    >
+                        {index + 1}
+                    </Pagination.Item>
+                    <Pagination.Next disabled={currentPage === totalPages} />
+                    <Pagination.Last disabled={currentPage === totalPages} />
+                </Pagination>
+            </Container> */}
+
+            <Container>
+                <h1>Utility Classes</h1>
+                <div className='mt-4 p-3 bg-light'>harsha vardhan</div>
+                <div className='mb-4 px-4 py-2 bg-light'>harsha vardhan</div>
+                <div className='mx-auto p-4 py-2 bg-light border'>harsha vardhan</div>
+
+                <h1>Text classes</h1>
+                <p className='text-start'>text-start</p>
+                <p className='text-center'>text-center</p>
+                <p className='text-end'>text-end</p>
+                <p className='text-uppercase'>text-uppercase</p>
+                <p className='text-decoration-underline'>text-decoration-underline</p>
+                
+                <p className='fw-bold'>fw-bold</p>
+                <p className='fst-italic'>italic font style</p>
+                <p className='fs-1'>font style one</p>
+                <p className='fs-6'>font style six</p>
+
+                
+                
+                <h1>Colors</h1>
+                <p className='text-primary'>Text primary</p>
+                <p className='text-success'>Text success</p>
+                <p className='text-danger'>Text danger</p>
+                <p className='text-warning'>Text warning</p>
+                <p className='text-muted'>Text muted</p>
+
+                <span className='bg-primary text-dark'>bg-primary</span>
+                <span className='bg-danger text-white'>bg-danger</span>
+                <span className='bg-warning'>bg-warning</span>
+                <span className='bg-success'>bg-success</span>
+
+                <p className='fs-6 text-dark bg-primary fst-italic'>Display things</p>
+                <div className='d-none d-md-block bg-info'>
+                    Not on mobile, but on the desktop
+                </div>
+                <div className='d-block d-md-none bg-danger text-white'>
+                    Not on desktop, but on the mobile
+                </div>
+
+                <div>Align items space between</div>
+                <div className='d-flex justify-content-between border bg-light p-3 mb-2'>
+                    <span>Left</span>
+                    <span>Center</span>
+                    <span>Right</span>
+                </div>
+
+                <div>Items centered</div>
+                <div className='d-flex justify-content-center align-items-center border'
+                    style={{ height: '80px' }} >
+                        <span>Centered both ways</span>
+                </div>
+
+                <div className='d-flex gap-2 mb-2'>
+                    <Button variant='primary'>One</Button>
+                    <Button variant='danger'>Two</Button>
+                    <Button variant='warning'>Three</Button>
+                    <Button variant='info'>Info</Button>
+                </div>
+
+                <div>Borders and Rounded</div>
+
+                {/* ======= 6. BORDERS & ROUNDED ======= */}
+                <h4 className="mt-4">6. Borders & Rounded</h4>
+                <Row className="g-3">
+                    <Col xs={6} md={3}>
+                    <div className="border p-3 text-center">border</div>
+                    </Col>
+                    <Col xs={6} md={3}>
+                    <div className="border border-primary p-3 text-center">border-primary</div>
+                    </Col>
+                    <Col xs={6} md={3}>
+                    <div className="border rounded p-3 text-center">rounded</div>
+                    </Col>
+                    <Col xs={6} md={3}>
+                    <div className="border rounded-pill p-3 text-center">rounded-pill</div>
+                    </Col>
+                </Row>
+
+                {/* ======= 7. WIDTH & HEIGHT ======= */}
+                <h4 className="mt-4">7. Width</h4>
+                <div className="w-25 bg-light border p-2 mb-1">w-25 (25%)</div>
+                <div className="w-50 bg-light border p-2 mb-1">w-50 (50%)</div>
+                <div className="w-75 bg-light border p-2 mb-1">w-75 (75%)</div>
+                <div className="w-100 bg-light border p-2 mb-4">w-100 (100%)</div>
+
+            </Container>
+            
+
         </>
     )
 }
