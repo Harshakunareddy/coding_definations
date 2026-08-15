@@ -10,7 +10,7 @@ use App\Models\Student;
 class StudentController extends Controller
 {
     public function index(){
-        $student = Student->all();
+        $student = Student::all();
         \Log::info("Hello namaste");
         \Log::warning("asdfg");
         \Log::error($e);
@@ -28,7 +28,7 @@ class StudentController extends Controller
                 "age" => "required|integer"
             ]);
 
-            $student = Student->create([
+            $student = Student::create([
                 "name" => $request->name,
                 "email" => $request->email,
                 "age" => $request->age,
@@ -51,7 +51,7 @@ class StudentController extends Controller
 
     public function show($id){
         try{
-            $student = Student->find($id);
+            $student = Student::find($id);
             if(!$student){
                 return response()->json([
                     "status" => false,
@@ -76,7 +76,7 @@ class StudentController extends Controller
     }
 
     public function update(Request $request, $id){
-        $student = Student->find($id);
+        $student = Student::find($id);
 
         if(!student){
             return response()->json([
