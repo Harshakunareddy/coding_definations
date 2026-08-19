@@ -15,6 +15,9 @@ const Task = sequelize.define("Task", {
     allowNull: false,
     defaultValue: "pending",
   },
+},
+{
+  indexes: [{ fields: ['status'] }]
 });
 
 module.exports = Task;
