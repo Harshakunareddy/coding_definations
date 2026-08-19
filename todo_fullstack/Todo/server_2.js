@@ -28,8 +28,15 @@ app.get('/tasks', async (req,res) => {
    const limit = parseInt(req.query.limit) || 10; 
    const last_id = parseInt(req.query.last_id) || 0;
    
+    const where = { id: { [Op.gt]: last_id } };
+
+    if (search) {
+        where.name = { [Op.like]: `%${search}%` };
+    }
+
    const tasks = await Task.findAll({
-    where: { id: { [Option.gt]: last_id } },
+    // where: { id: { [Option.gt]: last_id } },
+    where,
     order: [['id', 'ASC']],
     limit,
    })
