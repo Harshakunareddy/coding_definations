@@ -1,7 +1,9 @@
 const express = require('express');
+const { Op } = require('sequelize');
 const app = express();
 const port = 3000;
 const Task = require("./models/Task");
+const { Op } = require('sequelize');
 
 
 app.use(express.json());
