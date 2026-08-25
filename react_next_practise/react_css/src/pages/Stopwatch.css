@@ -1,0 +1,133 @@
+.stopwatch-card {
+  max-width: 500px;
+  margin: 0 auto;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  box-shadow: 0 4px 12px var(--color-shadow);
+}
+
+.stopwatch-display {
+  font-size: 4rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+  color: var(--color-text);
+  margin-bottom: 2rem;
+  letter-spacing: 2px;
+}
+
+.stopwatch-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.stopwatch-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  min-width: 100px;
+}
+
+.stopwatch-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.stopwatch-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.stopwatch-btn--start {
+  background: var(--color-success);
+  color: white;
+}
+
+.stopwatch-btn--start:hover {
+  background: #16a34a;
+}
+
+.stopwatch-btn--stop {
+  background: var(--color-danger);
+  color: white;
+}
+
+.stopwatch-btn--stop:hover {
+  background: var(--color-danger-hover);
+}
+
+.stopwatch-btn--lap {
+  background: var(--color-primary);
+  color: white;
+}
+
+.stopwatch-btn--lap:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.stopwatch-btn--reset {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 2px solid var(--color-border);
+}
+
+.stopwatch-btn--reset:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.stopwatch-laps {
+  border-top: 1px solid var(--color-border);
+  padding-top: 1.5rem;
+}
+
+.stopwatch-laps-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+}
+
+.stopwatch-laps-list {
+  max-height: 250px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.stopwatch-lap-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem 1rem;
+  background: var(--color-bg);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+}
+
+.stopwatch-lap-num {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.stopwatch-lap-time {
+  font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+@media (max-width: 480px) {
+  .stopwatch-display {
+    font-size: 2.75rem;
+  }
+}

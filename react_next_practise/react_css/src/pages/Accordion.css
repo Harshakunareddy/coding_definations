@@ -1,0 +1,95 @@
+.accordion-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.accordion-controls {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.accordion-control-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg-card);
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.accordion-control-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.accordion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.accordion-item {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all var(--transition);
+}
+
+.accordion-item:hover {
+  border-color: var(--color-primary);
+}
+
+.accordion-item--open {
+  box-shadow: 0 4px 12px var(--color-shadow);
+}
+
+.accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 1rem;
+}
+
+.accordion-question {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.accordion-icon {
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--color-primary);
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+  line-height: 1;
+}
+
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.accordion-item--open .accordion-body {
+  max-height: 300px;
+}
+
+.accordion-answer {
+  padding: 0 1.25rem 1.25rem;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}

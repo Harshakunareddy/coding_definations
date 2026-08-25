@@ -1,0 +1,96 @@
+.counter-card {
+  max-width: 500px;
+  margin: 0 auto;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  box-shadow: 0 4px 12px var(--color-shadow);
+}
+
+.counter-value {
+  font-size: 5rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  transition: color 0.3s ease;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.counter-value--positive {
+  color: var(--color-success);
+}
+
+.counter-value--negative {
+  color: var(--color-danger);
+}
+
+.counter-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.counter-btn {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  min-width: 60px;
+}
+
+.counter-btn:active {
+  transform: scale(0.95);
+}
+
+.counter-btn--primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.counter-btn--primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.counter-btn--secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.counter-btn--secondary:hover {
+  background: #4b5563;
+}
+
+.counter-btn--success {
+  background: var(--color-success);
+  color: white;
+}
+
+.counter-btn--success:hover {
+  background: #16a34a;
+}
+
+.counter-btn--danger {
+  background: var(--color-danger);
+  color: white;
+}
+
+.counter-btn--danger:hover {
+  background: var(--color-danger-hover);
+}
+
+.counter-btn--outline {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 2px solid var(--color-border);
+}
+
+.counter-btn--outline:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}

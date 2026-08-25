@@ -1,0 +1,72 @@
+.tabs-container {
+  max-width: 700px;
+  margin: 0 auto;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 4px 12px var(--color-shadow);
+}
+
+.tabs-header {
+  display: flex;
+  border-bottom: 2px solid var(--color-border);
+  background: var(--color-bg);
+  overflow-x: auto;
+}
+
+.tabs-btn {
+  flex: 1;
+  padding: 1rem 1.25rem;
+  border: none;
+  background: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+}
+
+.tabs-btn:hover {
+  color: var(--color-primary);
+  background: var(--color-bg-card-hover);
+}
+
+.tabs-btn--active {
+  color: var(--color-primary);
+  font-weight: 600;
+  border-bottom-color: var(--color-primary);
+  background: var(--color-bg-card);
+}
+
+.tabs-content {
+  padding: 2rem;
+}
+
+.tabs-content-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+}
+
+.tabs-content-text {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+@media (max-width: 480px) {
+  .tabs-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .tabs-content {
+    padding: 1.25rem;
+  }
+}

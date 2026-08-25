@@ -1,0 +1,604 @@
+/*
+╔══════════════════════════════════════════════════════════════╗
+║          🎨  CSS INTERVIEW QUESTIONS (1–20)  🎨             ║
+║          ZERO TO HERO — BASIC TO ADVANCED                   ║
+║          EXPLANATIONS IN COMMENTS + REAL CODE               ║
+╚══════════════════════════════════════════════════════════════╝
+*/
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🟢  1. WHAT IS CSS?                            │
+   └─────────────────────────────────────────────────┘
+   CSS stands for Cascading Style Sheets.
+   It is used to style and layout HTML elements on a web page.
+   It controls colors, fonts, spacing, positioning, and responsiveness.
+*/
+
+h1 {
+    color: blue;
+    font-size: 24px;
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🔵  2. THREE WAYS TO ADD CSS                   │
+   └─────────────────────────────────────────────────┘
+   Inline   → style attribute directly on the element
+              <p style="color: red;">Hello</p>
+
+   Internal → <style> tag inside the <head>
+              <style> p { color: red; } </style>
+
+   External → separate .css file linked with <link> tag
+              <link rel="stylesheet" href="style.css" />
+
+   ✅ External is the most recommended approach.
+*/
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🟣  3. WHAT ARE CSS SELECTORS?                 │
+   └─────────────────────────────────────────────────┘
+   Selectors are patterns used to target HTML elements for styling.
+   Common selectors: element, class, id, universal, attribute.
+*/
+
+/* 🔹 element selector */
+p {
+    color: green;
+}
+
+/* 🔹 class selector */
+.myClass {
+    color: red;
+}
+
+/* 🔹 id selector */
+#myId {
+    color: blue;
+}
+
+/* 🔹 universal selector */
+* {
+    margin: 0;
+}
+
+/* 🔹 attribute selector */
+input[type="text"] {
+    border: 1px solid gray;
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🟠  4. WHAT IS THE CSS BOX MODEL?              │
+   └─────────────────────────────────────────────────┘
+   Every HTML element is a rectangular box with 4 layers:
+
+   ┌────────────── Margin ──────────────┐
+   │  ┌────────── Border ──────────┐    │
+   │  │  ┌────── Padding ──────┐   │    │
+   │  │  │    [ Content ]      │   │    │
+   │  │  └─────────────────────┘   │    │
+   │  └────────────────────────────┘    │
+   └────────────────────────────────────┘
+
+   Content → actual text/image area
+   Padding → space between content and border
+   Border  → wraps around the padding
+   Margin  → space outside the border
+
+   ⚡ Total width = content + padding*2 + border*2 + margin*2
+*/
+
+.box-model-example {
+    width: 200px;
+    padding: 20px;
+    border: 2px solid black;
+    margin: 10px;
+    /* Total width = 200 + 40 + 4 + 20 = 264px */
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🔴  5. WHAT IS BOX-SIZING?                     │
+   └─────────────────────────────────────────────────┘
+   box-sizing controls how width and height are calculated.
+
+   📦 content-box (default) → width only includes content
+   📦 border-box            → width includes content + padding + border
+
+   ✅ border-box is widely preferred for easier calculations.
+*/
+
+.content-box-example {
+    box-sizing: content-box;
+    width: 200px;
+    padding: 20px;
+    border: 2px solid black;
+    /* Actual width = 200 + 40 + 4 = 244px */
+}
+
+.border-box-example {
+    box-sizing: border-box;
+    width: 200px;
+    padding: 20px;
+    border: 2px solid black;
+    /* Actual width stays = 200px ✅ */
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🟡  6. MARGIN vs PADDING                       │
+   └─────────────────────────────────────────────────┘
+   🔸 Padding → space INSIDE the element (between content and border)
+   🔸 Margin  → space OUTSIDE the element (between border and others)
+   🔸 Padding affects background color area, margin does not.
+*/
+
+.margin-vs-padding {
+    padding: 20px;   /* 🔹 space inside */
+    margin: 30px;    /* 🔹 space outside */
+    background: lightblue;
+    /* background covers content + padding, NOT margin */
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🟢  7. WHAT IS DISPLAY PROPERTY?               │
+   └─────────────────────────────────────────────────┘
+   display defines how an element is rendered in the layout.
+
+   📌 block        → full width, new line        (div, p, h1)
+   📌 inline       → only needed width, no break (span, a)
+   📌 inline-block → inline but respects width/height
+   📌 none         → hides element completely
+   📌 flex         → flex container
+   📌 grid         → grid container
+*/
+
+.block-element {
+    display: block;
+    width: 100%;
+}
+
+.inline-element {
+    display: inline;
+}
+
+.inline-block-element {
+    display: inline-block;
+    width: 100px;
+    height: 50px;
+}
+
+.hidden-element {
+    display: none;
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🔵  8. WHAT IS POSITION IN CSS?                │
+   └─────────────────────────────────────────────────┘
+   position controls how an element is placed on the page.
+
+   📍 static   → default, normal document flow
+   📍 relative → moves from its normal position
+   📍 absolute → positioned to nearest positioned ancestor
+   📍 fixed    → positioned to viewport (stays on scroll)
+   📍 sticky   → switches between relative & fixed on scroll
+*/
+
+.pos-relative {
+    position: relative;
+    top: 10px;
+    left: 20px;
+}
+
+.pos-absolute {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.pos-fixed {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.pos-sticky {
+    position: sticky;
+    top: 0;
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🟣  9. WHAT IS FLEXBOX?                        │
+   └─────────────────────────────────────────────────┘
+   Flexbox is a one-dimensional layout system (row OR column).
+   It makes it easy to align and distribute space among items.
+   Parent = flex container, Children = flex items.
+
+   🔸 justify-content → flex-start | flex-end | center
+                         space-between | space-around | space-evenly
+   🔸 align-items     → flex-start | flex-end | center
+                         stretch | baseline
+*/
+
+.flex-container {
+    display: flex;
+    justify-content: center;      /* ↔️  horizontal alignment */
+    align-items: center;          /* ↕️  vertical alignment */
+    gap: 10px;                    /* 📏 space between items */
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-item-grow {
+    flex: 1;                      /* takes equal available space */
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🟠  10. WHAT IS CSS GRID?                      │
+   └─────────────────────────────────────────────────┘
+   Grid is a two-dimensional layout system (rows AND columns).
+   More powerful than flexbox for complex layouts.
+
+   ┌──────┬──────┬──────┐
+   │  1fr │  1fr │  1fr │  ← 3 equal columns
+   └──────┴──────┴──────┘
+*/
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;   /* 3 equal columns */
+    grid-template-rows: auto;
+    gap: 10px;
+}
+
+.grid-span-two {
+    grid-column: span 2;                  /* item spans 2 columns */
+}
+
+.grid-named-areas {
+    display: grid;
+    grid-template-areas:
+        "header header header"
+        "sidebar main main"
+        "footer footer footer";
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🔴  11. FLEXBOX vs GRID                        │
+   └─────────────────────────────────────────────────┘
+   ┌──────────────────┬──────────────────────────────┐
+   │     FLEXBOX      │           GRID               │
+   ├──────────────────┼──────────────────────────────┤
+   │ 1-dimensional    │ 2-dimensional                │
+   │ row OR column    │ rows AND columns             │
+   │ navbars, cards   │ full page layouts            │
+   │ content-first    │ layout-first                 │
+   └──────────────────┴──────────────────────────────┘
+
+   Use flexbox → navbars, single row/column layouts
+   Use grid    → full page layouts, complex 2D structures
+*/
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🟡  12. PSEUDO-CLASSES & PSEUDO-ELEMENTS       │
+   └─────────────────────────────────────────────────┘
+   🎯 Pseudo-classes   → style based on STATE     → single colon  (:)
+   🎯 Pseudo-elements  → style PART of element    → double colon  (::)
+*/
+
+/* ── Pseudo-classes ── */
+a:hover {
+    color: red;
+    text-decoration: underline;
+}
+
+a:focus {
+    outline: 2px solid blue;
+}
+
+li:nth-child(2) {
+    color: green;
+}
+
+li:first-child {
+    font-weight: bold;
+}
+
+/* ── Pseudo-elements ── */
+p::before {
+    content: "→ ";
+    color: orange;
+}
+
+p::after {
+    content: " ←";
+    color: orange;
+}
+
+p::first-line {
+    font-weight: bold;
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🟢  13. WHAT IS SPECIFICITY IN CSS?            │
+   └─────────────────────────────────────────────────┘
+   Specificity determines which CSS rule wins when
+   multiple rules target the same element.
+
+   ⚡ Priority (highest → lowest):
+   !important  >  inline style  >  #id  >  .class  >  element
+
+   📊 Score format: (inline, id, class, element)
+*/
+
+p          { color: blue; }          /* (0, 0, 0, 1) 🔹 lowest */
+.text      { color: green; }         /* (0, 0, 1, 0) 🔸        */
+#main      { color: red; }           /* (0, 1, 0, 0) 🔴        */
+/* inline style="color:pink"            (1, 0, 0, 0) 🟣        */
+/* !important                           ⚠️  overrides everything */
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🔵  14. WHAT ARE MEDIA QUERIES?                 │
+   └─────────────────────────────────────────────────┘
+   Media queries apply styles based on screen size or device.
+   Foundation of responsive web design.
+   ✅ Mobile-first: start small, add rules for larger screens.
+
+   📱 Mobile → 💻 Tablet → 🖥️  Desktop
+*/
+
+/* 📱 Mobile first */
+.responsive-container {
+    width: 100%;
+    padding: 10px;
+}
+
+/* 💻 Tablet */
+@media (min-width: 768px) {
+    .responsive-container {
+        width: 750px;
+        margin: 0 auto;
+    }
+}
+
+/* 🖥️  Desktop */
+@media (min-width: 1024px) {
+    .responsive-container {
+        width: 960px;
+    }
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🟣  15. CSS UNITS (px, em, rem, %, vh, vw)     │
+   └─────────────────────────────────────────────────┘
+   📏 px   → absolute, fixed size (1px = 1 pixel)
+   📏 em   → relative to PARENT element's font size
+   📏 rem  → relative to ROOT (html) element's font size
+   📏 %    → relative to parent element's size
+   📏 vh   → 1% of viewport height
+   📏 vw   → 1% of viewport width
+
+   ✅ rem for font sizes, vh/vw for full-screen layouts
+*/
+
+html {
+    font-size: 16px;         /* root base size */
+}
+
+.units-rem {
+    font-size: 1rem;         /* → 16px */
+}
+
+.units-em {
+    font-size: 1.5em;        /* → 1.5 × parent font size */
+}
+
+.units-percent {
+    width: 50%;              /* → 50% of parent width */
+}
+
+.units-viewport {
+    height: 100vh;           /* → full viewport height */
+    width: 100vw;            /* → full viewport width */
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🟠  16. WHAT IS Z-INDEX?                       │
+   └─────────────────────────────────────────────────┘
+   z-index controls stacking order of overlapping elements.
+   🔺 Higher z-index = element appears on top.
+   ⚠️  Only works on positioned elements.
+
+        ┌─────────┐  z-index: 10  (front)
+     ┌──┤         │
+     │  └─────────┘
+     │  z-index: 1   (back)
+     └────────────┘
+*/
+
+.layer-back {
+    position: relative;
+    z-index: 1;
+}
+
+.layer-front {
+    position: relative;
+    z-index: 10;
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🔴  17. OPACITY vs VISIBILITY vs DISPLAY       │
+   └─────────────────────────────────────────────────┘
+   👁️  opacity: 0         → invisible, takes space, ✅ clickable
+   👁️  visibility: hidden → invisible, takes space, ❌ NOT clickable
+   👁️  display: none      → completely removed from layout
+*/
+
+.transparent {
+    opacity: 0;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.removed {
+    display: none;
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🟡  18. TRANSITIONS & ANIMATIONS               │
+   └─────────────────────────────────────────────────┘
+   🔄 Transitions → smoothly change property on trigger (hover, click)
+   🎬 Animations  → keyframe-based multi-step, run automatically
+*/
+
+/* ── 🔄 Transition ── */
+.btn-transition {
+    background: blue;
+    color: white;
+    padding: 10px 20px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-transition:hover {
+    background: red;
+    transform: scale(1.05);
+}
+
+/* ── 🎬 Animation ── */
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse 1s infinite;
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🟢  19. RELATIVE vs ABSOLUTE POSITIONING       │
+   └─────────────────────────────────────────────────┘
+   📍 relative → moves from NORMAL position, still occupies original space
+   📍 absolute → removed from flow, positioned to nearest positioned ancestor
+   ⚠️  If no positioned ancestor, absolute uses <html>
+*/
+
+.parent-relative {
+    position: relative;         /* 🔹 becomes the reference point */
+    width: 300px;
+    height: 200px;
+}
+
+.child-absolute {
+    position: absolute;
+    top: 10px;
+    right: 10px;                /* 🔹 10px from top-right of .parent */
+}
+
+
+
+/* ┌─────────────────────────────────────────────────┐
+   │  🔵  20. CSS VARIABLES (CUSTOM PROPERTIES)      │
+   └─────────────────────────────────────────────────┘
+   CSS variables let you store values and reuse them.
+   🔸 Defined with  --  prefix
+   🔸 Accessed with var() function
+   ✅ Great for theming, consistent colors, easy maintenance.
+*/
+
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --font-size: 16px;
+    --spacing: 8px;
+    --border-radius: 4px;
+}
+
+.button-primary {
+    background: var(--primary-color);
+    color: white;
+    font-size: var(--font-size);
+    padding: var(--spacing) calc(var(--spacing) * 2);
+    border: none;
+    border-radius: var(--border-radius);
+}
+
+.button-danger {
+    background: var(--danger-color);
+    color: white;
+    font-size: var(--font-size);
+    padding: var(--spacing) calc(var(--spacing) * 2);
+    border: none;
+    border-radius: var(--border-radius);
+}
+
+.card {
+    border: 2px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: calc(var(--spacing) * 2);
+    margin: calc(var(--spacing) * 2);
+}
+
+
+/*
+╔══════════════════════════════════════════════════════════════╗
+║                  🎉  END OF CSS Q&A  🎉                    ║
+║              Happy Learning & Good Luck! 🚀                ║
+╚══════════════════════════════════════════════════════════════╝
+*/
