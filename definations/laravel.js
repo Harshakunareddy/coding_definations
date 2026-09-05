@@ -88,20 +88,20 @@ Provides features like template inheritance and components.
 
 /*
 10. SERVICE CONTAINER
-Service Container is a powerful tool for managing class dependencies.
-It handles dependency injection, automatically instantiating classes.
-It is the core of Laravel's functionality.
+Service Container = "The Smart Toolbox / Factory".
+It automatically builds and hands you the tools (classes) you need.
+(Handles dependency injection so you don't have to write 'new ClassName()').
 */
-// app()->make('Service');
+// public function pay(PaymentGateway $payment) { } // Automatically injected!
 
 
 /*
 11. SERVICE PROVIDERS
-Service Providers are the central place to configure and bootstrap Laravel.
-They bind things into the service container.
-Almost all core Laravel features are bootstrapped via providers.
+Service Provider = "The Factory Manager / Instruction Manual".
+It teaches the Service Container HOW to build complicated tools.
+(Registers and binds your classes into the Container before the app starts).
 */
-// public function register() { } public function boot() { }
+// public function register() { $this->app->bind('Payment', function() { return new PaymentGateway(); }); }
 
 
 /*
@@ -167,6 +167,18 @@ Uses Faker library internally.
 // User::factory()->count(50)->create();
 
 
+
+// public function definition()
+// {
+//     return [
+//         // id is missing because the database auto-increments it automatically!
+//         'name'   => fake()->name(),               // Generates: "John Doe"
+//         'email'  => fake()->unique()->safeEmail(), // Generates: "john99@example.com"
+//         'number' => fake()->phoneNumber(),         // Generates: "555-123-4567"
+//     ];
+// }
+
+
 /*
 19. RELATIONSHIPS
 Eloquent makes managing database relationships easy.
@@ -189,7 +201,8 @@ Controllers connect Models and Views.
 /*
 21. WHAT IS DEPENDENCY INJECTION?
 Dependency Injection (DI) is passing required objects into a class instead of creating them inside.
-Laravel's Service Container automatically resolves and injects these dependencies (e.g., in Controller constructors).
+Laravel's Service Container automatically resolves and injects these dependencies
+(e.g., in Controller constructors).
 Makes code much easier to test and loosely coupled.
 */
 // public function __construct(UserRepository $users) { $this->users = $users; }
@@ -211,6 +224,8 @@ Methods like created, updated, deleting automatically trigger when the model sta
 Keeps controllers clean and encapsulates model logic.
 */
 // class UserObserver { public function created(User $user) { /* send email */ } }
+// php artisan make:observer UserObserver --model=User
+
 
 
 /*
@@ -262,7 +277,8 @@ Helps hide sensitive data and formats responses consistently.
 /*
 29. ROUTE MODEL BINDING
 Instead of passing an ID to a controller and querying the database manually...
-Laravel automatically injects the model instance directly into your route/controller if the type-hint matches the route segment.
+Laravel automatically injects the model instance directly into your route/controller
+ if the type-hint matches the route segment.
 Returns a 404 automatically if the model is not found.
 */
 // Route::get('/users/{user}', function (User $user) { return $user->name; });
@@ -297,6 +313,8 @@ composer dump-autoload                             // Regenerate the list of all
 /*
 BASIC ARTISAN COMMANDS
 ----------------------------------------
+php artisan install:api
+
 php artisan serve                                  // Start the local development server
 php artisan list                                   // List all available artisan commands
 php artisan help [command]                         // Show help for a specific command

@@ -1,3 +1,4 @@
+
 <html>
     <h1 align="center">Hello Students Testing</h1>
 
@@ -102,6 +103,15 @@
             @error('age')
                 <span>{{ $message }}</span>
             @enderror
+        </div>
+
+        <div>
+            <input type="file" name="file" id="file" />
+
+            @error('file')
+                <span>{{ $message }}</span>
+            @enderror
+            
         </div>
 
         <button type="submit">Create Student</button>

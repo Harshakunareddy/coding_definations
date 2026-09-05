@@ -136,3 +136,4 @@ Automatically paginates results and handles the limit/offset behind the scenes.
 ```php
 $users = User::paginate(10); // Gets 10 users per page
 ```
+User::where('id', '>', 10)->get();

@@ -89,6 +89,12 @@ DELETE FROM users WHERE id = 1;
 
 delete from orders where email = 2 and user_id = 2 and price > 100;
 
+delete => rows
+truncate => entire data but cols and schema will be there
+drop => entire gone
+
+
+
 /*
 10. LIMIT
 Used to restrict number of rows returned.
