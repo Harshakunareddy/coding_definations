@@ -1,3 +1,21 @@
+php, Laravel files 2 
+
+model, controller, blade => create , update, delete, etc also a file upload also do in the public 
+
+eloquent_top_20.md
+
+single blade file => header, sidebar, footer
+
+MySQL file
+
+authCOntroller.php, middleware file, resource file , repository file 
+
+service file => google maps sdk , razorpay sdk things 
+
+
+
+
+
 # Top 20 Useful Things in Laravel Eloquent Models
 
 Eloquent ORM is Laravel's built-in database layer. It allows you to interact with your database using PHP objects instead of writing raw SQL. Here are the top 20 most useful features and methods you will use in an Eloquent Model:

@@ -1,24 +1,24 @@
 import { useState } from "react";
 
 const App = () => {
-    
+
     const [items, setItems] = useState([]);
     const [item, setItem] = useState("");
     const [age, setAge] = useState("");
     const [EditItem, setEditItem] = useState(null);
 
-    const handleSubmit = (e)=> {
+    const handleSubmit = (e) => {
         // e.preventDefault();
-        if(EditItem){
+        if (EditItem) {
             const items_all = [...items];
             // items_all[EditItem] = item;
-            items_all[EditItem] = {name: item, age: age};
+            items_all[EditItem] = { name: item, age: age };
             setItems(items_all);
             setEditItem(null);
             setItem("");
             setAge("");
-        }else{
-            const items = [...items, {name: item, age: age}];
+        } else {
+            const items = [...items, { name: item, age: age }];
             setItems(items);
             setItem("");
             setAge("");
@@ -32,36 +32,36 @@ const App = () => {
     }
 
     const handleDelete = (i) => {
-        const items = items.filter((item, key)=> key !== i);
+        const items = items.filter((item, key) => key !== i);
         setItems(items);
     }
 
 
     return (
         <>
-            {items.map((item,index)=>(
-                <div key={index}>
+            {items.map((item, index) => (
+                <div key={index} style={{ display: "flex", justifyContent: "space-between" }}>
                     <p>{item.name}</p>
                     <span
                         onClick={() => handleEdit(index)}
                     >Edit</span>
-                    <span 
+                    <span
                         onClick={() => handleDelete(index)}
                     >Delete</span>
                 </div>
             ))}
 
             <div>
-                <input 
-                    name="item" 
+                <input
+                    name="item"
                     value={item || ""}
                     type="text"
-                    onChange={(e)=>setItem(e.target.value)}
+                    onChange={(e) => setItem(e.target.value)}
                 />
-                <input type="number" 
+                <input type="number"
                     name="age"
                     value={age || ""}
-                    onChange={(e)=> setAge(e.target.value)}
+                    onChange={(e) => setAge(e.target.value)}
                 />
                 <button
                     onClick={handleSubmit}
