@@ -104,14 +104,76 @@ It teaches the Service Container HOW to build complicated tools.
 // public function register() { $this->app->bind('Payment', function() { return new PaymentGateway(); }); }
 
 
+
 /*
 12. FACADES
-Facades provide a "static" interface to classes available in container.
-They allow you to use methods without injecting the class.
-Examples: Cache::get(), Config::set().
-*/
-// Cache::put('key', 'value', 60);
 
+Facades provide an easy way to use Laravel classes
+without creating or injecting the class manually.
+
+Common Facades:
+
+Cache::get()
+Config::get()
+DB::table()
+Log::info()
+Auth::user()
+Storage::put()
+Mail::to()
+*/
+
+
+/*
+// Cache
+Cache:: put('name', 'Harsha', 60);
+$name = Cache:: get('name');
+
+// Config
+$appName = Config:: get('app.name');
+
+// Database
+$users = DB:: table('users') -> get();
+
+// Log
+Log:: info('User logged in');
+
+// Authentication
+$user = Auth:: user();
+
+// Storage
+Storage:: put('file.txt', 'Hello World');
+
+// Session
+Session:: put('name', 'Harsha');
+$name = Session:: get('name');
+
+// Redirect
+return Redirect:: route('home');
+
+// Validation
+$request -> validate([
+    'email' => 'required|email'
+]);
+
+Simple meaning:
+
+Cache   -> Store and get temporary data
+Config  -> Read application configuration
+DB      -> Work directly with database
+Log     -> Write messages to logs
+Auth    -> Get/check logged-in user
+Storage -> Upload/store files
+Session -> Store user session data
+Redirect-> Redirect to another page
+*/
+
+
+// | Feature           | Where data is stored  | Main purpose                                   | Example              |
+// | ----------------- | --------------------- | ---------------------------------------------- | -------------------- |
+// | **Session**       | Server                | Store user-specific temporary data             | Login user ID        |
+// | **Cookie**        | Browser               | Store small data in user's browser             | Remember preference  |
+// | **Cache**         | Server / Redis / File | Store data temporarily for faster access       | API/database results |
+// | **Local Storage** | Browser               | Store data on client permanently until removed | UI preferences/token |
 
 /*
 13. CSRF TOKEN
@@ -119,7 +181,7 @@ CSRF (Cross-Site Request Forgery) protection prevents malicious requests.
 Laravel automatically generates a CSRF token for each active user session.
 It must be included in HTML forms to verify the request origin.
 */
-// @csrf in Blade forms
+// @csrf in Blade forms inside the forms tags
 
 
 /*
@@ -139,6 +201,20 @@ Supports various drivers like Redis, Database.
 */
 // dispatch(new SendEmailJob($user));
 
+// php artisan make:job SendEmailJob
+// use Illuminate\Contracts\Queue\ShouldQueue;
+
+//     SendEmailJob::dispatch($user);
+// .env
+// QUEUE_CONNECTION=database
+
+// php artisan make:queue-table
+// php artisan migrate
+
+// php artisan queue:work
+
+
+
 
 /*
 16. EVENTS AND LISTENERS
@@ -148,14 +224,46 @@ Useful for decoupling code (e.g., sending welcome email after registration).
 */
 // Event::dispatch(new UserRegistered($user));
 
+// php artisan make:event UserRegistered
+// php artisan make:listener SendWelcomeEmail
+
+// app/Providers/AppServiceProvider.php
+// You can register the connection in EventServiceProvider:
+// protected $listen = [
+//     UserRegistered::class => [
+//         SendWelcomeEmail::class,
+//     ],
+// ];
+
 
 /*
 17. TASK SCHEDULING
-Task Scheduling allows scheduling cron jobs inside Laravel itself.
-Defined in app/Console/Kernel.php.
-Eliminates the need to add multiple SSH cron entries on the server.
+
+Task Scheduling is used to run commands or tasks automatically
+at a specific time or interval.
+
+Examples:
+- Send emails every day
+- Delete old records every week
+- Generate reports every month
+
+Laravel lets us define the schedule in code instead of
+creating many cron jobs manually on the server.
+
+Example:
 */
+// app/Console/Kernel.php // older laravel 
+// routes/console.php // modern laravel 
 // $schedule->command('emails:send')->daily();
+// ->daily();        // Every day
+// ->hourly();       // Every hour
+// ->weekly();       // Every week
+// ->monthly();      // Every month
+// ->everyMinute();  // Every minute
+
+
+
+
 
 
 /*
@@ -164,9 +272,8 @@ Factories define blueprints to generate fake data for models.
 Used mostly in testing and database seeding.
 Uses Faker library internally.
 */
-// User::factory()->count(50)->create();
 
-
+// php artisan make:factory PostFactory --model=Post
 
 // public function definition()
 // {
@@ -179,6 +286,10 @@ Uses Faker library internally.
 // }
 
 
+// php artisan tinker
+//\App\Models\Post::factory()->count(10)->create();
+
+
 /*
 19. RELATIONSHIPS
 Eloquent makes managing database relationships easy.
@@ -186,6 +297,10 @@ Supports One-To-One, One-To-Many, Many-To-Many, etc.
 Defined as methods on the model class.
 */
 // public function posts() { return $this->hasMany(Post::class); }
+
+
+
+
 
 
 /*
@@ -200,7 +315,11 @@ Controllers connect Models and Views.
 
 /*
 21. WHAT IS DEPENDENCY INJECTION?
-Dependency Injection (DI) is passing required objects into a class instead of creating them inside.
+Dependency Injection (DI) is
+
+passing required objects into a class instead of creating them inside.
+
+
 Laravel's Service Container automatically resolves and injects these dependencies
 (e.g., in Controller constructors).
 Makes code much easier to test and loosely coupled.
@@ -219,13 +338,21 @@ Only raw queries (e.g., DB::raw()) need manual caution.
 
 /*
 23. WHAT ARE OBSERVERS IN LARAVEL?
-Observers group event listeners for an Eloquent model into a single class.
-Methods like created, updated, deleting automatically trigger when the model state changes.
-Keeps controllers clean and encapsulates model logic.
-*/
-// class UserObserver { public function created(User $user) { /* send email */ } }
-// php artisan make:observer UserObserver --model=User
+"Observers are used to handle model-related events in one place.
+For example, when a User is created, updated, or deleted,
+the corresponding Observer method is automatically called.
+This keeps business logic out of the Controller."
 
+
+php artisan make:observer UserObserver --model=User
+app/Observers/UserObserver.php
+// class UserObserver { public function created(User $user) { /* send email */
+
+// In AppServiceProvider:
+// public function boot()
+// {
+// User::observe(UserObserver::class);
+// }
 
 
 /*
@@ -249,11 +376,19 @@ It handles file naming and saving securely.
 
 /*
 26. WHAT ARE ACCESSORS AND MUTATORS?
-Accessors alter data when you retrieve it from a model (e.g., formatting dates).
-Mutators alter data before it is saved to the database (e.g., hashing a password).
-They help standardize data formatting globally.
+Accessor  → GET  → Change data when reading  => ucfirst($name)
+Mutator   → SET  → Change data before saving => strtolower($name)
+
 */
-// public function getFirstNameAttribute($value) { return ucfirst($value); }
+// inside the model only 
+//   protected function name(): Attribute
+//     {
+//         return Attribute::make(
+//             get: fn ($value) => ucfirst($value),     // Accessor
+//             set: fn ($value) => strtolower($value),  // Mutator
+//         );
+//     }
+
 
 
 /*
@@ -262,7 +397,28 @@ Lazy loading queries related data only when accessed, leading to the "N+1 query 
 Eager loading fetches all required related models in just 1 or 2 queries upfront.
 Use the with() method to eager load and significantly improve performance.
 */
-// User::with('posts')->get(); // Eager Loading
+// LAZY LOADING
+
+// User::all()
+//    ↓
+// Get Users
+//    ↓
+// $user->orders
+//    ↓
+// Get Orders
+
+
+// EAGER LOADING
+
+// User::with('orders')->get()
+//    ↓
+// Get Users + Orders
+//    ↓
+// $user->orders
+//    ↓
+// Already Loaded
+
+
 
 
 /*
@@ -281,7 +437,15 @@ Laravel automatically injects the model instance directly into your route/contro
  if the type-hint matches the route segment.
 Returns a 404 automatically if the model is not found.
 */
-// Route::get('/users/{user}', function (User $user) { return $user->name; });
+
+// no need to write like this for simple things inside controller
+// User::findOrFail(10);
+
+// in routes file
+// use App\Models\User;
+// Route::get('/users/{user}', function (User $user) {
+//     return $user;
+// });
 
 
 /*
@@ -307,7 +471,9 @@ composer create-project laravel/laravel app-name   // Create a new Laravel proje
 composer install                                   // Install dependencies from composer.json
 composer update                                    // Update all dependencies to latest versions
 composer require package/name                      // Install a new package
-composer dump-autoload                             // Regenerate the list of all classes that need to be included
+composer dump-autoload                             // Autoloading means automatically finding and loading a PHP class when we use it, without manually 
+                                                    // using require or include. Composer manages this autoloading for Laravel.
+                                                    // Regenerate the list of all classes that need to be included
 */
 
 /*

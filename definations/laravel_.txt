@@ -1,0 +1,855 @@
+LARAVEL / PHP INTERVIEW QUICK REVISION
+========================================
+
+Basic PHP + Laravel questions and short explanations.
+
+
+1. PHP ARRAY FUNCTIONS
+----------------------
+
+array_merge()
+- Merges two or more arrays.
+- Numeric keys are re-indexed.
+- String keys from later arrays overwrite earlier values.
+
+Example:
+$a = [1, 2];
+$b = [3, 4];
+$result = array_merge($a, $b);
+// [1, 2, 3, 4]
+
+Interview point:
+array_merge() combines arrays, while + performs a union and keeps keys from the first array.
+
+
+array_combine()
+- Creates an array using one array for keys and another for values.
+- Both arrays must have the same number of elements.
+
+array_combine(['name', 'age'], ['Harsha', 25]);
+// ['name' => 'Harsha', 'age' => 25]
+
+
+array_diff()
+- Returns values present in the first array but not in the other arrays.
+
+array_diff([1,2,3], [2,3]);
+// [1]
+
+
+array_intersect()
+- Returns values common to all arrays.
+
+array_intersect([1,2,3], [2,3,4]);
+// [2,3]
+
+
+in_array()
+- Checks whether a value exists in an array.
+in_array('admin', $roles);
+
+
+array_key_exists()
+- Checks whether a key exists in an array.
+array_key_exists('email', $user);
+
+
+array_keys()
+- Returns all keys of an array.
+
+
+array_values()
+- Returns all values and re-indexes numeric keys.
+
+
+count()
+- Returns the number of elements.
+count($users);
+
+
+array_map()
+- Applies a function to every element and returns a new array.
+
+array_map(fn($x) => $x * 2, [1,2,3]);
+// [2,4,6]
+
+
+array_filter()
+- Filters an array based on a condition.
+
+array_filter([1,2,3,4], fn($x) => $x > 2);
+// [3,4]
+
+
+array_reduce()
+- Reduces an array to a single value.
+
+array_reduce([1,2,3], fn($carry, $x) => $carry + $x, 0);
+// 6
+
+
+sort() vs usort()
+- sort(): sorts simple values in ascending order.
+- usort(): sorts using a custom comparison function.
+
+
+2. PHP BASIC INTERVIEW QUESTIONS
+--------------------------------
+
+== vs ===
+- == checks value after type conversion.
+- === checks both value AND data type.
+
+5 == "5"     // true
+5 === "5"    // false
+
+
+isset() vs empty()
+- isset($x): true when variable exists and is not null.
+- empty($x): true when value is considered empty, such as "", 0, "0", null, false, [].
+
+
+null vs false
+- null means no value / absence of value.
+- false is a boolean value.
+
+
+include vs require
+- include: warning if file is missing; script can continue.
+- require: fatal error if file is missing; script stops.
+
+
+public / protected / private
+- public: accessible everywhere.
+- protected: accessible inside class and child classes.
+- private: accessible only inside the same class.
+
+
+GET vs POST
+- GET: data is sent in URL; commonly used for fetching.
+- POST: data is sent in request body; commonly used for creating/submitting data.
+
+
+3. LARAVEL REQUEST LIFECYCLE
+----------------------------
+
+Basic flow:
+Request
+ -> public/index.php
+ -> Laravel application bootstrap
+ -> HTTP Kernel / middleware
+ -> routing
+ -> controller
+ -> model/service
+ -> response
+ -> middleware
+ -> client
+
+Interview answer:
+"Laravel receives the request through the entry point, passes it through middleware and routing, executes the controller/business logic, and returns the response."
+
+
+4. ROUTES
+---------
+
+Route::get('/users', ...);
+- Handles GET requests.
+
+Route::post('/users', ...);
+- Handles POST requests.
+
+Route::put('/users/{id}', ...);
+- Usually updates the complete resource.
+
+Route::patch('/users/{id}', ...);
+- Usually updates part of a resource.
+
+Route::delete('/users/{id}', ...);
+- Deletes a resource.
+
+
+Route Model Binding
+- Laravel automatically resolves a route parameter into a model.
+
+Route:
+Route::get('/users/{user}', ...);
+
+Controller:
+public function show(User $user)
+{
+    return $user;
+}
+
+Laravel finds the User model based on the route parameter.
+
+
+5. CONTROLLERS
+--------------
+
+Controller
+- Handles HTTP request logic and coordinates application logic.
+- Business-heavy logic is often better moved into services.
+
+
+6. MIDDLEWARE
+-------------
+
+Middleware
+- Filters/intercepts HTTP requests before they reach the controller.
+- Can also modify/check the response.
+
+Common examples:
+- Authentication
+- Authorization
+- Logging
+- CORS
+- Rate limiting
+
+Example:
+Route::middleware('auth')->get('/profile', ...);
+
+Simple custom middleware idea:
+if (!$request->user()) {
+    return response()->json(['message' => 'Unauthorized'], 401);
+}
+
+return $next($request);
+
+
+7. CSRF
+-------
+
+CSRF = Cross-Site Request Forgery.
+
+Laravel protects state-changing web requests using a CSRF token.
+
+Blade:
+@csrf
+
+Usually important for POST, PUT, PATCH and DELETE forms.
+
+
+8. VALIDATION
+------------
+
+Example:
+$request->validate([
+    'name' => 'required|string|max:255',
+    'email' => 'required|email',
+    'age' => 'required|integer|min:18',
+]);
+
+If validation fails, Laravel automatically handles the validation error response depending on the request type.
+
+
+9. ELOQUENT ORM
+---------------
+
+Eloquent is Laravel's ORM for interacting with database tables using models.
+
+User::all();
+User::find(1);
+User::where('age', '>', 18)->get();
+User::where('email', $email)->first();
+User::create([...]);
+$user->update([...]);
+$user->delete();
+
+
+first() vs get()
+- first(): returns one model or null.
+- get(): returns a collection of models.
+
+
+find() vs where()
+- find($id): searches by primary key.
+- where(): allows custom conditions.
+
+
+findOrFail()
+- Finds a model or throws a 404 ModelNotFoundException.
+
+User::findOrFail($id);
+
+
+9. MASS ASSIGNMENT
+------------------
+
+fillable
+- Specifies fields allowed for mass assignment.
+
+protected $fillable = ['name', 'email'];
+
+User::create([
+    'name' => 'Harsha',
+    'email' => 'test@example.com'
+]);
+
+
+guarded
+- Specifies fields protected from mass assignment.
+
+protected $guarded = ['id'];
+
+Interview point:
+$fillable is an allow-list; $guarded is a block-list.
+
+
+10. ELOQUENT RELATIONSHIPS
+--------------------------
+
+One-to-One:
+return $this->hasOne(Profile::class);
+
+
+One-to-Many:
+return $this->hasMany(Post::class);
+
+
+Belongs-To:
+return $this->belongsTo(User::class);
+
+
+Many-to-Many:
+return $this->belongsToMany(Role::class);
+
+
+Example:
+$user->posts;
+- Gets posts related to the user.
+
+
+11. EAGER vs LAZY LOADING
+-------------------------
+
+Lazy loading:
+$user->posts;
+
+The relationship is loaded when accessed.
+
+Eager loading:
+User::with('posts')->get();
+
+The relationship is loaded along with the users.
+
+Interview point:
+Eager loading helps prevent the N+1 query problem.
+
+
+12. N+1 QUERY PROBLEM
+---------------------
+
+Example:
+$users = User::all();
+
+foreach ($users as $user) {
+    echo $user->posts;
+}
+
+This can cause one query for users + one query for each user's posts.
+
+Better:
+$users = User::with('posts')->get();
+
+
+13. QUERY BUILDER
+-----------------
+
+DB::table('users')->where('age', '>', 18)->get();
+
+Useful for database queries without directly using Eloquent models.
+
+
+14. MIGRATIONS
+--------------
+
+Migrations are version-controlled database schema changes.
+
+php artisan make:migration create_users_table
+php artisan migrate
+php artisan migrate:rollback
+
+Interview point:
+Migrations make database structure reproducible across environments.
+
+
+15. SEEDERS & FACTORIES
+-----------------------
+
+Seeder
+- Inserts predefined/sample data.
+
+Factory
+- Defines how fake model data should be generated.
+
+Commands:
+php artisan db:seed
+php artisan make:factory UserFactory
+
+
+16. ARTISAN
+-----------
+
+Artisan is Laravel's command-line tool.
+
+Common commands:
+
+php artisan serve
+php artisan migrate
+php artisan migrate:rollback
+php artisan make:controller UserController
+php artisan make:model User -m
+php artisan make:middleware AuthMiddleware
+php artisan route:list
+php artisan cache:clear
+php artisan config:clear
+
+
+17. COLLECTIONS
+---------------
+
+Laravel Collection is an object-oriented wrapper for working with arrays/data.
+
+$users->map(...)
+$users->filter(...)
+$users->pluck('email')
+$users->first()
+$users->count()
+
+map()
+- Transforms every item.
+
+filter()
+- Keeps items matching a condition.
+
+pluck()
+- Extracts a specific field.
+
+
+18. API RESPONSE
+----------------
+
+return response()->json([
+    'message' => 'Success',
+    'data' => $users
+]);
+
+Common status codes:
+200 = OK
+201 = Created
+204 = No Content
+400 = Bad Request
+401 = Unauthenticated
+403 = Forbidden
+404 = Not Found
+422 = Validation Error
+500 = Server Error
+502 → Gateway got a bad response
+      "The server behind me isn't responding properly."
+
+503 → Service is temporarily unavailable
+      "I can't handle your request right now."
+
+19. AUTHENTICATION vs AUTHORIZATION
+-----------------------------------
+
+Authentication:
+- "Who are you?"
+- Example: login/token verification.
+
+Authorization:
+- "What are you allowed to do?"
+- Example: admin can delete users but normal users cannot.
+
+
+20. BEARER TOKEN
+---------------
+
+A client sends a token in the Authorization header:
+
+Authorization: Bearer <token>
+
+Middleware can read the token, validate it, identify the user, and either continue the request or return 401 Unauthorized.
+
+
+21. API RESOURCE
+----------------
+
+Laravel API Resources transform models into a clean JSON structure.
+
+return new UserResource($user);
+
+Useful when you want consistent API response formatting.
+
+
+22. ENVIRONMENT CONFIG
+---------------------
+
+.env
+- Stores environment-specific values such as database credentials and application keys.
+
+Example:
+DB_HOST=127.0.0.1
+DB_DATABASE=myapp
+
+Never hard-code secrets in source code.
+
+
+23. CACHE
+--------
+
+Cache stores frequently used data temporarily to improve performance.
+
+Cache::put('key', $value, 60);
+Cache::get('key');
+Cache::forget('key');
+
+
+24. QUEUES / JOBS
+-----------------
+
+Queues allow slow tasks to run in the background.
+
+Examples:
+- Sending emails
+- Notifications
+- Processing large files
+
+Basic flow:
+Dispatch Job -> Queue -> Worker -> Job executes
+
+php artisan queue:work
+
+
+25. EVENTS & LISTENERS
+---------------------
+
+Event:
+- Represents something that happened.
+
+Listener:
+- Reacts to that event.
+
+Example:
+OrderPlaced event
+ -> SendOrderEmail listener
+
+
+26. JOB vs EVENT
+----------------
+
+Job:
+- A task that should be executed.
+
+Event:
+- Announces that something happened.
+
+Example:
+Job = GenerateInvoice
+Event = OrderPlaced
+
+
+27. SOFT DELETE
+--------------
+
+Instead of physically deleting a record, Laravel sets deleted_at.
+
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+protected:
+use SoftDeletes;
+
+$user->delete();
+
+To include deleted records:
+User::withTrashed()->get();
+
+Only deleted:
+User::onlyTrashed()->get();
+
+
+28. TRANSACTIONS
+---------------
+
+Used when multiple database operations must succeed or fail together.
+
+DB::transaction(function () {
+    // operation 1
+    // operation 2
+});
+
+If an exception occurs, the transaction is rolled back.
+
+
+29. SQL BASICS
+-------------
+
+DELETE
+- Removes rows.
+- Can use WHERE.
+- Table remains.
+
+TRUNCATE
+- Removes all rows quickly.
+- Resets auto-increment in many databases.
+- Cannot normally use WHERE.
+
+DROP
+- Removes the table itself, including its structure.
+
+
+30. INDEX
+--------
+
+An index improves lookup/query performance.
+
+Example:
+Indexing email can make searching users by email faster.
+
+Trade-off:
+Indexes improve reads but consume storage and can make INSERT/UPDATE operations slightly more expensive.
+
+
+31. UNIQUE
+----------
+
+A UNIQUE constraint prevents duplicate values.
+
+Example:
+email should be unique for each user.
+
+
+32. FOREIGN KEY
+--------------
+
+A foreign key connects records between tables.
+
+Example:
+posts.user_id -> users.id
+
+It helps maintain referential integrity.
+
+
+33. LAZY vs EAGER vs CHUNK
+--------------------------
+
+Lazy:
+Load data when needed.
+
+Eager:
+Load related data together using with().
+
+Chunk:
+Process large datasets in smaller batches.
+
+User::chunk(100, function ($users) {
+    foreach ($users as $user) {
+        // process
+    }
+});
+
+
+34. PAGINATION
+--------------
+
+$users = User::paginate(10);
+
+Returns users in pages of 10 and provides pagination metadata.
+
+
+35. API PAGINATION
+------------------
+
+Common response concepts:
+- current page
+- per page
+- total records
+- last page
+- next/previous page URL
+
+
+36. DEPENDENCY INJECTION
+-----------------------
+
+Laravel's service container can automatically inject class dependencies.
+
+Example:
+public function __construct(UserService $userService)
+{
+    $this->userService = $userService;
+}
+
+Benefit:
+- Cleaner code
+- Easier testing
+- Loose coupling
+
+
+37. SERVICE CONTAINER
+--------------------
+
+Laravel's service container manages class dependencies and dependency injection.
+
+It can resolve classes automatically or bind interfaces to implementations.
+
+
+38. SERVICE PROVIDER
+--------------------
+
+Service Providers are used to register/bootstrap application services.
+
+Common place for:
+- Service bindings
+- Package registration
+- Application bootstrapping
+
+
+39. FACADES
+-----------
+
+Facades provide a simple static-looking interface to Laravel services.
+
+Examples:
+DB::table(...)
+Cache::get(...)
+Log::info(...)
+
+Behind the scenes, Laravel resolves the underlying service from the container.
+
+
+40. REQUEST vs RESPONSE
+----------------------
+
+Request:
+- Data coming from client to server.
+
+Response:
+- Data sent from server to client.
+
+Request examples:
+$request->input('name');
+$request->query('page');
+$request->header('Authorization');
+
+
+41. PUT vs PATCH
+---------------
+
+PUT:
+- Usually replaces the complete resource.
+
+PATCH:
+- Usually updates only selected fields.
+
+
+42. COMMON LARAVEL HTTP FLOW ANSWER
+-----------------------------------
+
+If asked:
+"What happens when an API request comes to Laravel?"
+
+Answer:
+"Request enters through public/index.php, Laravel bootstraps the application, middleware processes the request, the router finds the matching route, the controller handles the request, the service/model performs business and database operations, and Laravel returns the response through the middleware stack to the client."
+
+
+43. QUICK DIFFERENCE QUESTIONS
+------------------------------
+
+array_merge vs array_combine
+- merge arrays vs create key-value pairs.
+
+array_map vs array_filter
+- transform every item vs keep matching items.
+
+first vs get
+- one model vs collection.
+
+find vs where
+- primary-key lookup vs custom condition.
+
+fillable vs guarded
+- allowed fields vs protected fields.
+
+authentication vs authorization
+- identity vs permissions.
+
+include vs require
+- warning/continue vs fatal/stop.
+
+PUT vs PATCH
+- full replacement vs partial update.
+
+delete vs truncate vs drop
+- remove selected/all rows vs remove all rows vs remove table.
+
+lazy vs eager loading
+- load when accessed vs load relationships upfront.
+
+Job vs Event
+- execute a task vs announce something happened.
+
+401 vs 403
+- 401 = not authenticated.
+- 403 = authenticated but not allowed.
+
+
+44. VERY COMMON INTERVIEW ONE-LINERS
+------------------------------------
+
+What is Laravel?
+- A PHP web framework following MVC architecture.
+
+What is Eloquent?
+- Laravel's ORM for database interaction.
+
+What is Blade?
+- Laravel's templating engine.
+
+What is Artisan?
+- Laravel's command-line interface.
+
+What is middleware?
+- A layer that filters/processes HTTP requests and responses.
+
+What is migration?
+- Version-controlled database schema management.
+
+What is a model?
+- A class representing/interacting with database data.
+
+What is MVC?
+- Model = data, View = UI, Controller = request/application flow.
+
+What is ORM?
+- Object Relational Mapping; works with database records as objects.
+
+What is REST API?
+- An API style using HTTP methods and resources.
+
+What is mass assignment?
+- Creating/updating models using an array of attributes.
+
+What is N+1?
+- Excessive queries caused by loading related data individually in a loop.
+
+What is a queue?
+- A system for processing jobs asynchronously.
+
+What is a transaction?
+- A group of database operations treated as one atomic operation.
+
+
+INTERVIEW TIP
+-------------
+
+For every Laravel concept, try to answer in this order:
+
+1. Definition
+2. Why it is used
+3. Small example
+4. One important interview point
+
+Example:
+"Middleware is a layer between the request and controller. It is used for authentication,
+authorization, logging, rate limiting, etc. For example, auth middleware checks whether
+the user is logged in before allowing access to a route."
