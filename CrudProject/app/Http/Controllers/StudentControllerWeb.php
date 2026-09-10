@@ -3,14 +3,17 @@
 use App\Models\Student;
 use Illuminate\Http\Request;
 
-class StudentControllerWeb extends Controller{
-    public function index(){
+class StudentControllerWeb extends Controller
+{
+    public function index()
+    {
         $student = Student::all();
-        return view('student', compact('students'));
+        return view('student', compact('student'));
     }
 
-    public function create(Request $request){
-        try{
+    public function create(Request $request)
+    {
+        try {
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|unique:students,email',
@@ -31,7 +34,7 @@ class StudentControllerWeb extends Controller{
 
             return redirect()->route('students.index')->with('success', "Student Created Successfully");
 
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json([
                 "status" => false,
                 "message" => $e->getMessage(),
@@ -39,7 +42,8 @@ class StudentControllerWeb extends Controller{
         }
     }
 
-    public function show($id){
+    public function show($id)
+    {
         try {
             $student = Student::find($id);
             return view('student', compact('student'));
@@ -51,7 +55,8 @@ class StudentControllerWeb extends Controller{
         }
     }
 
-    public function update(Request $request, $id){
+    public function update(Request $request, $id)
+    {
 
         $request->validate([
             'name' => 'nullable|max:255|string',
@@ -71,7 +76,8 @@ class StudentControllerWeb extends Controller{
 
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
         $student = Student::findOrFail($id);
         $student->delete();
 

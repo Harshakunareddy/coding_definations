@@ -2,14 +2,18 @@
 
 
 <html>
-<nav
-    style="background-color: black; color: white; padding: 10px; position: fixed; width: 100%; height: 100px; top: 0; z-index: 1;">
+<nav style="background-color: black; color: white; padding: 10px; position: fixed; 
+    width: 100%; height: 100px; top: 0; z-index: 1;">
     <ul>
         <li><a href="#">Home</a></li>
         <li><a href="#">About</a></li>
         <li><a href="#">Contact</a></li>
     </ul>
 </nav>
+
+<div style="color: red; padding: 10px;">
+
+</div>
 
 </html>
 
@@ -28,8 +32,8 @@
 
 
 <html>
-<div
-    style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: fixed; left: 0;">
+<div style="display: flex; flex-direction: column; align-items: center; 
+    justify-content: center; position: fixed; left: 0;">
     <div id="hamburger" style="background-color: black; color: white; padding: 10px;">
         <span style="display: block; width: 30px; height: 5px; background-color: white; margin: 5px;"></span>
         <span style="display: block; width: 30px; height: 5px; background-color: white; margin: 5px;"></span>

@@ -252,7 +252,7 @@ COALESCE(phone,'No Phone')
 FROM users;
 
 
-
+  
 1. Find Duplicate Emails
 select email, count(*) from users group by email having count(*) > 1;
 

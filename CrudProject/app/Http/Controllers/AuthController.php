@@ -114,21 +114,21 @@ class AuthController extends Controller
     {
         // 1. Get the amount the user wants to pay (e.g. from the request)
         // Defaulting to 500 rupees if not provided
-        $amount = $request->input('amount', 500); 
-        
+        $amount = $request->input('amount', 500);
+
         // 2. Generate a unique receipt ID for your database
         $receiptId = 'receipt_' . time();
-        
+
         // 3. Use the injected service to create the Razorpay order
         $orderResponse = $paymentService->createOrder($amount, $receiptId);
-        
+
         if (!$orderResponse['success']) {
             return response()->json([
-                'message' => 'Failed to create order', 
+                'message' => 'Failed to create order',
                 'error' => $orderResponse['error']
             ], 500);
         }
-        
+
         return response()->json([
             'message' => 'Order created successfully',
             'order_id' => $orderResponse['order_id'],

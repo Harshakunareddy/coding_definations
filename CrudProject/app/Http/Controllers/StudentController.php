@@ -12,12 +12,22 @@ class StudentController extends Controller
     public function index()
     {
         $student = Student::all();
+
+        // $students = Student::paginate(10);
+        // @foreach ($students as $student)
+        //     <p>{{ $student->name }}</p>
+        // @endforeach
+
+        // {{ $students->links() }}
+
+
+
         \Log::info("Hello namaste");
         \Log::warning("asdfg");
-        \Log::error($e);
-        \Log::error($e->getMessage());
-        \Log::debug($e);
-        \Log::debug($request->all());
+        // \Log::error($e);
+        // \Log::error($e->getMessage());
+        // \Log::debug($e);
+        // \Log::debug($request->all());
         \Log::critical("Hmm DB Is Down");
         return response()->json([
             "success" => true,
