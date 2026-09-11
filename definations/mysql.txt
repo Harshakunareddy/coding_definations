@@ -339,3 +339,54 @@ select MAX(salary) from employees
             from employees
             where dep_id = e.dep_id
         );
+
+
+21. Find Employees With the Same Department as Rahul
+    select * from employees 
+        where dep_id = (
+            select dep_id from employees where name = "Rahul"
+        );
+
+
+22. Find Employees Who Have a Manager
+    SELECT *
+    FROM employees
+    WHERE manager_id IS NOT NULL;
+
+
+23. Find the Total Salary and Average Salary of Employees
+    SELECT
+        SUM(salary) AS total_salary,
+        AVG(salary) AS average_salary
+    FROM employees;
+
+
+    select sum(salary), avg(salary), max(salary), min(salary) from employees;
+
+24. Find Employees Whose Salary Is Greater Than Their Department's Minimum Salary
+    select * from employees e
+        where salary > (
+            select min(salary) from employees
+            where dep_id = e.dep_id
+        );
+
+
+25. Find Departments Where the Average Salary Is Greater Than 50,000
+    select dep_id, avg(salary) as avg_salary from employees group by dep_id
+    having avg_salary > 50000;
+
+
+26. Find Employees Who Earn More Than Their Manager
+    select * from employees e1
+        where salary > (
+            select salary from employees e2
+                where e2.id = e1.manager_id
+        );
+
+27. Highest-paid employee in each department
+    select * from employees e1
+        where salary = (
+            select max(salary) from employees e2
+            where e2.dep_id = e1.dep_id
+        );
+    

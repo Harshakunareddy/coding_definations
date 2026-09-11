@@ -13,6 +13,24 @@ It is known for reliability, scalability, and performance.
 */
 SELECT 'Hello PostgreSQL';
 
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    profile JSONB
+);
+
+
+SELECT *
+FROM users
+WHERE profile->>'city' = 'Hyderabad';
+
+You want to show each employee plus their salary rank.
+
+SELECT
+    name,
+    salary,
+    RANK() OVER (ORDER BY salary DESC) AS salary_rank
+FROM employees;
 
 /*
 2. POSTGRES vs MYSQL
