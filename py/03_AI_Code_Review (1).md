@@ -50,6 +50,14 @@ Both check:
 100 >= 80
 ```
 
+
+account = (
+    db.query(Account)
+    .filter(Account.user_id == user_id)
+    .with_for_update()
+    .first()
+)
+
 Both continue.
 
 This can cause an incorrect balance or double spending.
@@ -57,6 +65,26 @@ This can cause an incorrect balance or double spending.
 ## Fix
 
 Use a transaction and database locking/atomic update.
+
+used for lock =>     .with_for_update()
+in sql for lock => 
+
+BEGIN;
+
+SELECT *
+FROM accounts
+WHERE user_id = 1
+FOR UPDATE;
+
+-- check/update
+
+UPDATE accounts
+SET balance = balance - 80
+WHERE user_id = 1;
+
+COMMIT;
+
+
 
 Example:
 
@@ -177,6 +205,26 @@ Better still, query directly using the authenticated identity.
 def pay(order_id, amount):
     charge_card(amount)
     mark_order_paid(order_id)
+```
+
+```python
+def pay(order_id, amount):
+    # Generate an idempotency key
+     idempotency_key = str(uuid4())
+
+    # Check if this key already exists
+    existing = IdempotencyStore.get(idempotency_key)
+    if existing:
+        return existing.result
+
+    # Perform the operation
+    charge_card(amount)
+    mark_order_paid(order_id)
+
+    # Store the result
+    IdempotencyStore.set(idempotency_key, result)
+
+    return result
 ```
 
 ## Question

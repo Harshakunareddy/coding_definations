@@ -1,3 +1,45 @@
+Context Assembly — 10 Simple Points
+Set a hard token budget
+Know the maximum tokens and leave some safety margin.
+Keep mandatory information first
+Keep system instructions, user question, and security/tenant information.
+Retrieve relevant data
+Search for documents related to the user's question.
+Filter by authorization
+Never put another tenant's data into the context, even if it is highly relevant.
+Rerank the results
+If retrieval returns 100 chunks but you need 8, rank them and keep the best ones.
+Remove duplicates
+Don't waste tokens sending the same information multiple times.
+Summarize old conversation
+Keep recent useful messages and summarize important older decisions.
+Drop low-value information first
+Remove unrelated content, marketing/noise, duplicates, and low-relevance documents.
+Gracefully degrade when context is too large
+Use fewer documents, shorter history, or summaries instead of simply failing.
+Assemble the final context
+
+Simple pipeline:
+User Question
+      ↓
+Retrieve
+      ↓
+Permission Filter
+      ↓
+Rerank
+      ↓
+Deduplicate
+      ↓
+Token Budget
+      ↓
+Summarize if needed
+      ↓
+Final Context
+      ↓
+LLM
+
+
+
 # 02 — Context Assembly Interview Practice
 
 ## Simple meaning
