@@ -1,4 +1,22 @@
+TENANT
+  ↓
+Company A
+Company B
+Company C
+
+RLS
+  ↓
+Controls which rows each company can see/use
+
+CREATE POLICY project_read
+ON projects
+FOR SELECT
+USING (company_id = current_company_id());
+
+
 # 01 — RLS / Data Isolation Interview Practice
+
+This is a PostgreSQL Row-Level Security (RLS) policy:
 
 ## How to use this file
 
@@ -38,6 +56,14 @@ FOR SELECT
 USING (company_id = current_company_id());
 ```
 
+| id | company_id | name      |
+| -: | ---------: | --------- |
+|  1 |         10 | Project A |
+|  2 |         10 | Project B |
+|  3 |         20 | Project C |
+|  4 |         20 | Project D |
+
+
 > Note: `current_company_id()` is an example helper function. In a real system, the important part is that the value comes from a trusted database session/authentication context.
 
 ## Questions
@@ -49,14 +75,21 @@ USING (company_id = current_company_id());
 
 ## Expected answer
 
-The database must get the company identity from a trusted source. A user must not be able to change the trusted company ID through normal request data.
 
-Also make sure RLS is actually enabled on the table and that the application role cannot bypass it.
+1. What does this policy do?
+It controls SELECT access on the projects table. A user can only see projects belonging to their company.
 
-The important rule is:
+2. What must current_company_id() return?
 
-> The tenant/company identity must come from a trusted authentication context, not from normal user input.
+It must return the authenticated user's trusted company ID. For example, if the user belongs to company 10, it should return 10.
 
+3. What happens if the application lets a user change the company ID sent to the database?
+
+That's a security problem. A user could try to set the company ID to another company and access its data. The company ID used by the policy must come from a trusted authentication/session context, not normal request input.
+
+4. What is the main security rule?
+
+Never trust the company/tenant ID supplied directly by the user. The database should get it from a trusted identity.
 ---
 
 # LEVEL 2 — JOIN leak
@@ -314,6 +347,10 @@ Inspect:
 - Whether the caller can access the view
 - Whether the view can expose rows that should be hidden
 
+
+<!-- SELECT pg_get_viewdef('harsha'::regclass, true); -->
+
+
 The key idea:
 
 > "A secure table does not automatically mean every derived object is secure."
@@ -560,6 +597,84 @@ When given a schema and policies, say this:
 14. Are foreign-key child tables protected?
 15. Can another API path reach the same data?
 ```
+
+LEVEL 14 — Answers
+
+1. What is the security boundary?
+
+"The security boundary is the tenant or company. One company should never be able to access another company's data."
+
+2. Where does the trusted user/tenant identity come from?
+
+"It should come from trusted authentication or session context. We should not trust a tenant ID directly from the request body or URL."
+
+3. Which tables contain tenant data?
+
+"I will identify tables containing tenant_id, company_id, organization_id, or relationships to tenant-owned data."
+
+4. Does every sensitive table have protection?
+
+"I will verify that every tenant-owned table has the correct RLS policy. Protecting only the main table is not enough."
+
+5. Can data be reached through JOINs?
+
+"Yes, so I will check all joined tables. If one sensitive table is not protected, a JOIN could create a data leak."
+
+6. What about views?
+
+"I will inspect the view definition, its owner and permissions, and check whether the underlying data is properly isolated. I won't assume a view is automatically safe."
+
+7. What about functions?
+
+"I will check whether functions access tenant data and especially look for SECURITY DEFINER, because a function with elevated privileges can create an authorization bypass if it is badly designed."
+
+8. What about INSERT?
+
+"I need to make sure a user cannot insert a row belonging to another tenant. I would use WITH CHECK to validate the tenant ID of the new row."
+
+Example:
+
+WITH CHECK (company_id = current_company_id())
+
+9. What about UPDATE?
+
+"I need to verify both which rows the user can update and what values they can change them to."
+
+10. What about DELETE?
+
+"The user should only be able to delete rows belonging to their own tenant."
+
+11. Can ownership/tenant_id be changed?
+
+"This is important. A user from Company A should not be able to update a record and change its company_id to Company B."
+
+Example attack:
+
+UPDATE projects
+SET company_id = 20
+WHERE id = 100;
+
+12. Can a service/admin role bypass this?
+
+"Yes, potentially. I will check which database role the application uses and whether that role can bypass RLS. RLS does not automatically mean every database role is restricted."
+
+13. Can IDs be guessed?
+
+"Even if IDs are predictable, authorization must prevent access to another tenant's records. UUIDs can make guessing harder, but they are not a replacement for authorization."
+
+14. Are foreign-key child tables protected?
+
+"I will check child tables too. Protecting projects but not project_files, for example, could still allow another tenant's files to be accessed."
+
+15. Can another API path reach the same data?
+
+"I will check all possible access paths, such as search, reports, exports, dashboards, APIs, views, functions, and background jobs."
+
+⭐ Best final answer in an interview
+
+If they ask you to review the whole schema, say:
+
+"First, I'll identify the security boundary and determine where the trusted tenant identity comes from. Then I'll identify every tenant-owned table and check RLS for SELECT, INSERT, UPDATE, and DELETE. I'll also trace indirect access through JOINs, views, functions, and foreign-key child tables. Finally, I'll check privileged roles, predictable IDs, tenant ownership changes, and other API paths that could access the same data."
 
 ---
 

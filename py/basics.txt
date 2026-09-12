@@ -1,0 +1,124 @@
+PYTHON + FASTAPI 30 BASIC INTERVIEW QUESTIONS & ANSWERS
+
+Simple English answers you can say directly in an interview.
+
+1.  What is Python? Python is a high-level, easy-to-read programming
+    language. It is commonly used for web development, APIs, automation,
+    data work, and AI.
+
+2.  What are the main features of Python? Python is simple, dynamically
+    typed, object-oriented, interpreted, and has many built-in and
+    third-party libraries.
+
+3.  What is a list in Python? A list is an ordered and changeable
+    collection. It can contain multiple values, and we can add, remove,
+    or update items.
+
+4.  What is a tuple? A tuple is an ordered collection like a list, but
+    it cannot be changed after it is created. We use parentheses, like
+    (1, 2, 3).
+
+5.  What is a dictionary? A dictionary stores data as key-value pairs.
+    For example, {‘name’: ‘John’, ‘age’: 25}.
+
+6.  What is the difference between list and tuple? A list is mutable, so
+    we can change it. A tuple is immutable, so we cannot change it after
+    creation.
+
+7.  What is a function in Python? A function is a reusable block of code
+    that performs a specific task. We create it using the def keyword.
+
+8.  What is a class and object? A class is a blueprint for creating
+    objects. An object is an instance of a class that contains data and
+    behavior.
+
+9.  What is inheritance? Inheritance allows one class to reuse
+    properties and methods from another class. It helps us avoid
+    duplicate code.
+
+10. What is exception handling? Exception handling is used to handle
+    runtime errors without crashing the application. In Python, we
+    commonly use try, except, and finally.
+
+11. What is FastAPI? FastAPI is a modern Python web framework used to
+    build APIs. It is fast, supports async programming, and
+    automatically provides API documentation.
+
+12. Why do you use FastAPI? I use FastAPI because it is simple, fast,
+    supports async and dependency injection, validates request data, and
+    provides Swagger documentation automatically.
+
+13. How do you create a basic FastAPI application? We create a FastAPI
+    object, define routes using decorators like @app.get(), and start
+    the application using an ASGI server such as Uvicorn.
+
+14. What is an API endpoint? An endpoint is a URL where the client can
+    send a request to perform an operation. For example, GET /users can
+    return a list of users.
+
+15. What are GET, POST, PUT, PATCH, and DELETE? GET is used to read
+    data. POST creates data. PUT usually replaces or updates a resource.
+    PATCH partially updates it. DELETE removes it.
+
+16. What is Uvicorn? Uvicorn is an ASGI server used to run FastAPI
+    applications. For example: uvicorn main:app –reload.
+
+17. What is ASGI? ASGI stands for Asynchronous Server Gateway Interface.
+    It allows Python web applications to handle asynchronous requests
+    and supports modern web protocols.
+
+18. What is Pydantic in FastAPI? Pydantic is used for data validation
+    and serialization. We define schemas with Pydantic models, and
+    FastAPI validates incoming data automatically.
+
+19. What is a Pydantic model? A Pydantic model defines the expected
+    structure and types of data. For example, a User model can have
+    name, email, and age fields.
+
+20. What is request body? The request body is data sent by the client to
+    the API, usually as JSON. In FastAPI, a Pydantic model can be used
+    to validate that data.
+
+21. What is path parameter? A path parameter is a value included in the
+    URL. For example, /users/10 has 10 as the user_id path parameter.
+
+22. What is a query parameter? A query parameter is sent after a
+    question mark in the URL. For example, /users?page=2&limit=10.
+    FastAPI can read and validate these parameters.
+
+23. What is Depends() in FastAPI? Depends is FastAPI’s dependency
+    injection feature. It lets us reuse common logic such as database
+    connections, authentication, or permissions.
+
+24. How do you connect a database in FastAPI? A common approach is to
+    use SQLAlchemy with a database such as PostgreSQL or MySQL. We
+    create a database session and inject it into routes using Depends().
+
+25. What is SQLAlchemy? SQLAlchemy is a Python SQL toolkit and ORM. It
+    lets us work with database tables using Python models and queries
+    instead of writing every SQL statement manually.
+
+26. What is middleware in FastAPI? Middleware is code that runs around
+    requests and responses. It can be used for logging, CORS,
+    authentication-related processing, timing, and other common tasks.
+
+27. What is async and await? async defines an asynchronous function, and
+    await waits for an asynchronous operation to complete. They are
+    useful for I/O operations such as API calls or database operations
+    when the library supports async.
+
+28. How do you handle errors in FastAPI? We can raise HTTPException with
+    a status code and message. FastAPI then returns an appropriate error
+    response to the client.
+
+29. How do you implement authentication in FastAPI? A common approach is
+    JWT authentication. After successful login, the server creates a
+    token. The client sends the token with later requests, and a
+    dependency verifies it.
+
+30. What is Swagger/OpenAPI in FastAPI? FastAPI automatically generates
+    OpenAPI documentation. Swagger UI provides an interactive page where
+    we can view endpoints, parameters, schemas, and test API requests.
+
+QUICK INTERVIEW TIP: Keep answers short first. If the interviewer asks
+for more detail, then explain with a small example.
