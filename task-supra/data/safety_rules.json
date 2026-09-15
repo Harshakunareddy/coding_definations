@@ -1,0 +1,207 @@
+{
+  "drug_classes": {
+    "NSAID_CLASS": [
+      "nsaid",
+      "nsaids",
+      "ibuprofen",
+      "brufen",
+      "advil",
+      "motrin",
+      "diclofenac",
+      "voveran",
+      "voltaren",
+      "aspirin",
+      "acetylsalicylic",
+      "ecosprin",
+      "disprin",
+      "naproxen",
+      "naprosyn",
+      "ketorolac",
+      "toradol",
+      "indomethacin",
+      "indocin",
+      "celecoxib",
+      "celebrex",
+      "etoricoxib",
+      "etozox",
+      "aceclofenac",
+      "acenac",
+      "mefenamic",
+      "meftal",
+      "piroxicam",
+      "nimesulide",
+      "nimulid",
+      "ketoprofen",
+      "combiflam"
+    ],
+    "SULFONYLUREA_CLASS": [
+      "glimepiride",
+      "amaryl",
+      "glibenclamide",
+      "gliclazide",
+      "glipizide"
+    ]
+  },
+  "rules": [
+    {
+      "id": "RULE-PT-RAJAN-NSAID",
+      "type": "patient_contraindication",
+      "enforcement": "hard_block",
+      "trigger": {
+        "patient": "Rajan"
+      },
+      "blocks": [
+        "NSAID_CLASS"
+      ],
+      "source": "SUPRA-KB-002",
+      "message": "Patient Rajan has an ABSOLUTE contraindication to all NSAIDs (ibuprofen, aspirin, diclofenac and class). Cardiac stent 2022, on dual antiplatelet therapy. 8 previous refusals documented; family requests must also be refused firmly.",
+      "safe_alternative": "Paracetamol 650mg QDS (Supra formulary brand: Calpol / Dolo). Escalate to Tramadol 50mg if pain remains severe. Discuss with Cardiology before any change to antiplatelet therapy."
+    },
+    {
+      "id": "RULE-POSTTKR-NSAID",
+      "type": "procedure_contraindication",
+      "enforcement": "hard_block",
+      "trigger": {
+        "any_term": [
+          "post-tkr",
+          "post tkr",
+          "tkr",
+          "total knee replacement",
+          "knee replacement",
+          "arthroplasty"
+        ]
+      },
+      "blocks": [
+        "NSAID_CLASS"
+      ],
+      "source": "SUPRA-KB-001",
+      "message": "Supra Ortho prohibits NSAIDs at ALL steps of post-TKR analgesia due to surgical bleeding risk (Dr. Vikram, January 2025).",
+      "safe_alternative": "Paracetamol 650mg QDS first-line; escalate to Tramadol 50mg if VAS > 6."
+    },
+    {
+      "id": "RULE-WARFARIN-NSAID",
+      "type": "drug_interaction",
+      "enforcement": "hard_block",
+      "trigger": {
+        "any_term": [
+          "warfarin",
+          "coumadin",
+          "inr",
+          "anticoagulated",
+          "blood thinner"
+        ]
+      },
+      "blocks": [
+        "NSAID_CLASS"
+      ],
+      "source": "SUPRA-KB-010",
+      "message": "CRITICAL interaction: NSAIDs must NEVER be prescribed to a patient on Warfarin - risk of life-threatening GI bleed.",
+      "safe_alternative": "Paracetamol for pain."
+    },
+    {
+      "id": "RULE-DM-FASTING-SULFONYLUREA",
+      "type": "condition_contraindication",
+      "enforcement": "hard_block",
+      "trigger": {
+        "all_of": [
+          [
+            "fasting",
+            "fast",
+            "ekadashi",
+            "nil by mouth",
+            "npo"
+          ],
+          [
+            "diabet",
+            "type 2 dm",
+            "t2dm",
+            "dm",
+            "padma"
+          ]
+        ]
+      },
+      "blocks": [
+        "SULFONYLUREA_CLASS"
+      ],
+      "source": "SUPRA-KB-005",
+      "message": "Glimepiride (and sulfonylureas) must be SKIPPED on fast days for Type 2 DM patients - hypoglycemia risk.",
+      "safe_alternative": "Adjust insulin TIMING not dose. Continue Metformin with the evening meal."
+    },
+    {
+      "id": "RULE-TKR-DISCHARGE-48H",
+      "type": "operational_guard",
+      "enforcement": "hard_block",
+      "trigger": {
+        "all_of": [
+          [
+            "discharge",
+            "send home",
+            "going home",
+            "day case",
+            "same day"
+          ],
+          [
+            "tkr",
+            "total knee replacement",
+            "knee replacement"
+          ]
+        ]
+      },
+      "blocks": [],
+      "source": "SUPRA-KB-006",
+      "message": "TKR patients must NOT be discharged before 48 hours post-op. A patient discharged at 36 hours developed DVT at home and required emergency readmission.",
+      "safe_alternative": "Minimum 48 hours post-op stay. Confirm DVT prophylaxis is running before discharge planning."
+    },
+    {
+      "id": "RULE-VERBAL-ORDER",
+      "type": "operational_guard",
+      "enforcement": "advisory",
+      "trigger": {
+        "any_term": [
+          "verbal order",
+          "verbally",
+          "over the phone",
+          "phone order",
+          "told me to",
+          "on the phone"
+        ]
+      },
+      "blocks": [],
+      "source": "SUPRA-KB-011",
+      "message": "Verbal orders for medication changes require written confirmation within 1 hour. Exception: cardiac arrest only.",
+      "safe_alternative": "Obtain written confirmation within 1 hour and document it."
+    },
+    {
+      "id": "RULE-ORTHO-DVT-MANDATORY",
+      "type": "care_completeness",
+      "enforcement": "advisory",
+      "trigger": {
+        "all_of": [
+          [
+            "post-op",
+            "postop",
+            "post op",
+            "after surgery",
+            "surgical",
+            "tkr",
+            "thr",
+            "knee replacement",
+            "hip replacement"
+          ],
+          [
+            "pain",
+            "analgesi",
+            "discharge",
+            "manage",
+            "plan",
+            "prescri"
+          ]
+        ]
+      },
+      "blocks": [],
+      "source": "SUPRA-KB-004",
+      "message": "Reminder: ALL ortho surgical patients require DVT prophylaxis - Enoxaparin 40mg SC daily from 12 hours post-op (14 days TKR / 28 days THR). Confirm it is prescribed.",
+      "safe_alternative": null
+    }
+  ]
+}

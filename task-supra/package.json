@@ -1,0 +1,15 @@
+{
+  "name": "supra-hospital-ai",
+  "version": "1.0.0",
+  "description": "Supra Multi-Specialty Hospital, Hyderabad - Governed Clinical AI Assistant",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "eval": "node eval/run-eval.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5"
+  }
+}

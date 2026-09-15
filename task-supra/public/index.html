@@ -1,0 +1,825 @@
+<!doctype html>
+<!--
+  index.html — The main webpage for the Supra Hospital AI Assistant.
+
+  This is the chat interface that doctors and nurses see in their browser.
+  They type a medical question, and this page sends it to the server,
+  gets back a safe answer, and shows it on screen.
+
+  Page Layout (top to bottom):
+    1. HEADER  — Blue title bar at the top (hospital name)
+    2. MAIN    — Scrollable area where all Q&A chat messages appear
+    3. FOOTER  — Fixed bar at the bottom with the text input and Send button
+-->
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <!-- Makes the page look correct on mobile phones (not zoomed out) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Supra Assistant</title>
+
+  <style>
+    /* ── RESET ──────────────────────────────────────────────────────────────
+       Makes sure padding and borders are included inside element sizes.
+       This prevents unexpected layout issues across all browsers. */
+    * {
+      box-sizing: border-box
+    }
+
+    /* ── PAGE HEIGHT ────────────────────────────────────────────────────────
+       Makes the page fill the full browser window height.
+       This is needed so the header stays at the top and footer stays at the
+       bottom, with the chat area filling the space in between. */
+    html,
+    body {
+      height: 100%
+    }
+
+    /* ── BODY (the whole page) ──────────────────────────────────────────────
+       - No margin (removes the default white space around the page edge)
+       - Sets the font, size, and text colour for the whole page
+       - Light blue-grey background colour
+       - flex + flex-direction: column = stacks header, main, footer top-to-bottom */
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #233;
+      background: #eef2f7;
+      display: flex;
+      flex-direction: column
+    }
+
+    /* ── HEADER (top blue bar) ──────────────────────────────────────────────
+       Dark blue background with white text.
+       flex: 0 0 auto = the header stays a fixed height (doesn't grow/shrink). */
+    header {
+      background: #12609e;
+      color: #fff;
+      padding: 14px 0;
+      flex: 0 0 auto
+    }
+
+    /* ── WRAP (centred content container) ───────────────────────────────────
+       Limits content width to 880px and centres it on wide screens.
+       Used inside both the header and footer to keep content aligned. */
+    .wrap {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 20px;
+      width: 100%
+    }
+
+    /* ── HEADER TITLE (hospital name) ───────────────────────────────────────
+       "Supra Assistant" text — slightly large, no extra margin. */
+    header h1 {
+      font-size: 19px;
+      margin: 0
+    }
+
+    /* ── HEADER SUBTITLE (hospital description below the title) ─────────────
+       "Supra Multi-Specialty Hospital, Hyderabad · Clinical Decision Support"
+       Smaller, light blue text so it doesn't compete with the main title. */
+    header p {
+      margin: 2px 0 0;
+      font-size: 12.5px;
+      color: #bcd8ef
+    }
+
+    /* ── MAIN (the scrollable chat area) ────────────────────────────────────
+       flex: 1 1 auto = this section grows to fill all the space between
+       the header and footer. When messages overflow, it scrolls vertically. */
+    main {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 22px 0
+    }
+
+    /* ── INTRO BOX (welcome message shown before the first question) ─────────
+       White card with a border, shown at the top of the chat area.
+       It disappears as soon as the user asks their first question. */
+    .intro {
+      background: #fff;
+      border: 1px solid #cfd9e4;
+      border-radius: 6px;
+      padding: 18px 20px
+    }
+
+    /* ── INTRO HEADING ("Ask about Supra Hospital protocol") ─────────────── */
+    .intro h2 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      color: #12609e
+    }
+
+    /* ── INTRO DESCRIPTION (the small text below the intro heading) ────────── */
+    .intro p {
+      margin: 0;
+      font-size: 14px;
+      color: #556
+    }
+
+    /* ── TURN (one Q&A conversation block) ──────────────────────────────────
+       Each time the user asks a question, one "turn" card is created.
+       It contains the user's question (blue bar at top) and the answer below. */
+    .turn {
+      background: #fff;
+      border: 1px solid #cfd9e4;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      overflow: hidden
+    }
+
+    /* ── Q (the user's question — shown as a blue-tinted bar at the top of each turn) */
+    .q {
+      background: #f4f7fa;
+      border-bottom: 1px solid #e3e9f0;
+      padding: 11px 16px;
+      font-weight: bold;
+      color: #12609e
+    }
+
+    /* ── INNER (the white area below the question, where the answer sits) ─── */
+    .inner {
+      padding: 16px
+    }
+
+    /* ── ALERT (red warning box shown when a safety rule blocks something) ───
+       Has a thick red left border to make it visually stand out.
+       Used for: safety rule violations AND request error messages. */
+    .alert {
+      border-left: 4px solid #c0392b;
+      background: #fdf2f0;
+      padding: 11px 14px;
+      margin-bottom: 14px;
+      border-radius: 0 4px 4px 0
+    }
+
+    /* ── ALERT HEADING (e.g. "SUPRA SAFETY RULE" or "REQUEST FAILED") ───────
+       Shown in small, red, ALL-CAPS text at the top of an alert box. */
+    .alert strong.hd {
+      display: block;
+      color: #a5281b;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px
+    }
+
+    /* ── ALERT BODY TEXT ─────────────────────────────────────────────────── */
+    .alert p {
+      margin: 0 0 6px
+    }
+
+    /* Remove the bottom margin from the very last paragraph inside an alert */
+    .alert p:last-child {
+      margin: 0
+    }
+
+    /* ── ANSWER (the AI's response text area) ────────────────────────────── */
+    .answer p {
+      margin: 0 0 10px
+    }
+
+    /* Bullet point list inside an answer */
+    .answer ul {
+      margin: 0 0 10px;
+      padding-left: 22px
+    }
+
+    /* Individual bullet points */
+    .answer li {
+      margin-bottom: 4px
+    }
+
+    /* Sub-headings inside an answer (rendered from markdown ## headings) */
+    .answer h4 {
+      margin: 14px 0 6px;
+      font-size: 13px;
+      color: #12609e;
+      text-transform: uppercase;
+      letter-spacing: .04em
+    }
+
+    /* Italic/emphasis text inside an answer — rendered slightly smaller and grey */
+    .answer em {
+      color: #6b7a8a;
+      font-size: 13.5px
+    }
+
+    /* Remove top margin from the very first element inside an answer */
+    .answer>*:first-child {
+      margin-top: 0
+    }
+
+    /* Remove bottom margin from the very last element inside an answer */
+    .answer>*:last-child {
+      margin-bottom: 0
+    }
+
+    /* ── CODE (inline code text, e.g. drug codes like `SUPRA-KB-001`) ───────
+       Light grey pill background to make code stand out from normal text. */
+    code {
+      background: #eef2f7;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 13.5px
+    }
+
+    /* Bold text inside an answer — slightly darker colour than normal */
+    .answer strong {
+      color: #1a2b3c
+    }
+
+    /* ── FOOTER (the fixed bar at the bottom with the input box) ─────────────
+       White background with a thin top border to separate it from the chat.
+       flex: 0 0 auto = stays a fixed height, never grows or shrinks. */
+    footer {
+      flex: 0 0 auto;
+      background: #fff;
+      border-top: 1px solid #cfd9e4;
+      padding: 12px 0 14px
+    }
+
+    /* ── CHIPS (quick-select question buttons above the input box) ───────────
+       A horizontal scrollable row of example question buttons.
+       The user can click any chip to instantly fill the input box with that question. */
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;      /* scroll sideways if buttons don't fit */
+      padding: 0 20px 10px;
+      max-width: 880px;
+      margin: 0 auto;
+      scrollbar-width: thin  /* thin scrollbar on Firefox */
+    }
+
+    /* Thin scrollbar track for Chrome/Safari */
+    .chips::-webkit-scrollbar {
+      height: 6px
+    }
+
+    /* Grey scrollbar thumb for Chrome/Safari */
+    .chips::-webkit-scrollbar-thumb {
+      background: #c3cfdb;
+      border-radius: 3px
+    }
+
+    /* ── CHIP BUTTON (each individual quick-question pill) ───────────────────
+       Rounded pill shape, light grey background, blue text. */
+    .chips button {
+      flex: 0 0 auto;
+      white-space: nowrap;    /* prevent button text from wrapping to a new line */
+      padding: 7px 14px;
+      font-size: 13px;
+      background: #f4f7fa;
+      color: #12609e;
+      border: 1px solid #d6e0ea;
+      border-radius: 16px;
+      cursor: pointer
+    }
+
+    /* Chip button hover — slightly darker background and blue border */
+    .chips button:hover {
+      background: #e6eef6;
+      border-color: #12609e
+    }
+
+    /* ── FORM (the text input + Ask button row) ──────────────────────────── */
+    form {
+      display: flex;
+      gap: 8px
+    }
+
+    /* ── TEXT INPUT (where the user types their question) ───────────────────
+       Takes up all available width (flex: 1), with rounded pill shape. */
+    input[type=text] {
+      flex: 1 1 auto;
+      min-width: 0;
+      padding: 11px 14px;
+      font-size: 15px;
+      border: 1px solid #a9b8c8;
+      border-radius: 22px
+    }
+
+    /* When the input is focused (clicked into) — blue border + soft glow ring */
+    input[type=text]:focus {
+      outline: none;
+      border-color: #12609e;
+      box-shadow: 0 0 0 2px #d6e6f4
+    }
+
+    /* ── ASK BUTTON (the blue "Ask" button) ─────────────────────────────────
+       Dark blue background, white text, rounded pill shape. Fixed width. */
+    form button {
+      flex: 0 0 auto;
+      padding: 11px 26px;
+      font-size: 15px;
+      border-radius: 22px;
+      cursor: pointer;
+      background: #12609e;
+      color: #fff;
+      border: 1px solid #12609e
+    }
+
+    /* Darker blue on hover */
+    form button:hover {
+      background: #0e4d80
+    }
+
+    /* While waiting for a response — button is greyed out and not clickable */
+    form button:disabled {
+      opacity: .5;
+      cursor: not-allowed
+    }
+
+    /* ── STATUS LINE (small text below the input showing model info) ─────────
+       Shows things like "Model: Gemini · gemini-pro" or error messages. */
+    .status {
+      font-size: 11.5px;
+      color: #7a8b9d;
+      margin: 8px 0 0;
+      text-align: center
+    }
+
+    /* ── LOADING TEXT (shown while waiting for the server response) ──────────
+       Italic grey text — "Checking Supra protocols..." */
+    .loading {
+      color: #7a8b9d;
+      font-style: italic;
+      margin: 0
+    }
+
+    /* ── DEGRADED BANNER (shown when the AI model is unavailable) ────────────
+       Yellow/amber warning banner — tells the user the LLM is down and answers
+       are coming from the raw protocol database instead. */
+    .degraded {
+      margin: 0 0 12px;
+      padding: 8px 12px;
+      background: #fff8e6;
+      border-left: 4px solid #d9a300;
+      border-radius: 0 4px 4px 0;
+      font-size: 13px;
+      color: #7a5c00
+    }
+
+    /* ── MOBILE / SMALL SCREEN ADJUSTMENTS ──────────────────────────────────
+       On screens narrower than 600px (phones), reduce the left/right padding
+       and make the Ask button a bit narrower so it fits better. */
+    @media(max-width:600px) {
+
+      .wrap,
+      .chips {
+        padding-left: 12px;
+        padding-right: 12px
+      }
+
+      form button {
+        padding: 11px 18px
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── HEADER ─────────────────────────────────────────────────────────────
+       The blue bar at the very top of the page.
+       Shows the app name and hospital details. -->
+  <header>
+    <div class="wrap">
+      <h1>Supra Assistant</h1>
+      <p>Supra Multi-Specialty Hospital, Hyderabad &middot; Clinical Decision Support</p>
+    </div>
+  </header>
+
+  <!-- ── MAIN (scrollable chat area) ───────────────────────────────────────
+       This is where all the Q&A conversation cards appear.
+       "msgs" is the container that JavaScript adds new messages into. -->
+  <main id="main">
+    <div class="wrap" id="msgs">
+
+      <!-- INTRO BOX: shown before the user asks anything.
+           JavaScript removes this as soon as the first question is submitted. -->
+      <div class="intro" id="intro">
+        <h2>Ask about Supra Hospital protocol</h2>
+        <p>Answers are drawn from Supra's own ratified protocols and checked against the
+          hospital's clinical safety rules before they are shown.</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ── FOOTER (fixed bar at the bottom) ──────────────────────────────────
+       Contains:
+         1. Chips row  — quick-question buttons (loaded from server on startup)
+         2. Form row   — text input + Ask button
+         3. Status bar — small text showing model info or errors -->
+  <footer>
+    <!-- Quick-question chip buttons. JavaScript fills these in on page load. -->
+    <div class="chips" id="chips"></div>
+
+    <div class="wrap">
+      <!-- The main question input form -->
+      <form id="f">
+        <!-- Hidden label for screen readers (accessibility) -->
+        <label for="q" class="sr-only" style="position:absolute;left:-9999px">Your question</label>
+
+        <!-- Text box where the user types their question.
+             - autocomplete="off" prevents the browser from showing old suggestions
+             - autofocus = cursor is placed here automatically when page loads
+             - maxlength="1000" = can't type more than 1000 characters -->
+        <input id="q" type="text" autocomplete="off" autofocus maxlength="1000"
+          placeholder="Ask about Supra Hospital protocol">
+
+        <!-- The Ask/Send button. JavaScript disables this while waiting for a response. -->
+        <button id="send" type="submit">Ask</button>
+      </form>
+
+      <!-- Status line below the input box.
+           JavaScript updates this with model info, errors, or degraded mode notices. -->
+      <p class="status" id="status"></p>
+    </div>
+  </footer>
+
+  <script>
+    // ── HELPERS ──────────────────────────────────────────────────────────────
+
+    // Shortcut to find any HTML element by its id. Same as document.getElementById().
+    // Example: $('send') gives us the Ask button.
+    const $ = id => document.getElementById(id);
+
+    // Safety function: converts special characters in text to HTML-safe versions.
+    // This prevents hackers from injecting HTML/scripts through the answer text.
+    // Example: "<script>" becomes "&lt;script&gt;" which is shown as text, not executed.
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    // ── MARKDOWN RENDERER ─────────────────────────────────────────────────────
+    //
+    // WHAT IS THIS?
+    // The AI sends its answer back as plain text using "markdown" — a simple
+    // writing style where you use symbols like **, *, -, # to mean bold,
+    // italic, bullet, heading, etc.
+    //
+    // This function reads that markdown text and converts it into proper HTML
+    // so the browser can display it nicely (with real bold, real lists, etc.)
+    //
+    // Think of it like a translator:
+    //   AI writes:  "**Avoid** ibuprofen"
+    //   md() makes: "<strong>Avoid</strong> ibuprofen"
+    //   Browser shows: "Avoid ibuprofen"  (with "Avoid" in bold)
+    //
+    // PARAMETER:
+    //   t  →  the raw markdown text string from the AI's answer
+    //
+    // RETURNS:
+    //   A safe HTML string ready to be inserted into the page.
+    // ─────────────────────────────────────────────────────────────────────────
+    function md(t) {
+
+      // ── STEP 1: SAFETY ESCAPE ──────────────────────────────────────────────
+      // Before doing anything else, convert all "dangerous" characters into
+      // safe versions. This stops the AI from accidentally (or maliciously)
+      // injecting real HTML tags into the page.
+      //
+      // Characters converted:
+      //   &  →  &amp;
+      //   <  →  &lt;
+      //   >  →  &gt;
+      //   "  →  &quot;
+      //
+      // Example:
+      //   Input:   "Check <b>this</b> out"
+      //   After:   "Check &lt;b&gt;this&lt;/b&gt; out"
+      //   Browser shows it as plain text: "Check <b>this</b> out"
+      //   (the <b> tag is NOT treated as HTML — it's shown as literal text)
+      //
+      // This must always be the FIRST step, before we add any of our own HTML.
+      let h = esc(t);
+
+      // ── STEP 2: HEADINGS ──────────────────────────────────────────────────
+      // Markdown uses # symbols at the start of a line to make headings.
+      // One # = biggest heading, ###### = smallest. We map all of them to <h4>.
+      //
+      // The regex breakdown:  /^\s*#{1,6}\s*(.+)$/gm
+      //   ^        = start of a line
+      //   \s*      = allow optional spaces before the #
+      //   #{1,6}   = one to six # characters
+      //   \s*      = space(s) after the # (e.g. "## Title" has a space before Title)
+      //   (.+)     = capture the actual heading text
+      //   $        = end of the line
+      //   gm flags = search every line (g=global, m=multiline)
+      //
+      // Examples:
+      //   "## Safe Alternative"    →  "<h4>Safe Alternative</h4>"
+      //   "### First Line"         →  "<h4>First Line</h4>"
+      //   "#Pain Management Plan"  →  "<h4>Pain Management Plan</h4>"
+      h = h.replace(/^\s*#{1,6}\s*(.+)$/gm, '<h4>$1</h4>');
+
+      // ── STEP 3: BOLD TEXT ──────────────────────────────────────────────────
+      // Double asterisks around text = bold.
+      //
+      // The regex:  /\*\*(.+?)\*\*/g
+      //   \*\*     = two asterisk characters (escaped because * is special in regex)
+      //   (.+?)    = capture the text in between (? makes it non-greedy —
+      //              stops at the FIRST closing ** it finds, not the last)
+      //   \*\*     = closing two asterisks
+      //
+      // Examples:
+      //   "**Avoid** all NSAIDs"          →  "<strong>Avoid</strong> all NSAIDs"
+      //   "Give **Paracetamol 650mg** QDS" →  "Give <strong>Paracetamol 650mg</strong> QDS"
+      //   "**CRITICAL:** Never prescribe"  →  "<strong>CRITICAL:</strong> Never prescribe"
+      h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+      // ── STEP 4: ITALIC TEXT ────────────────────────────────────────────────
+      // Single asterisk around text = italic.
+      // This must run AFTER bold (step 3), so "**bold**" is already converted
+      // and won't be accidentally matched here.
+      //
+      // The regex:  /(^|[^*])\*([^*\n]+)\*/g
+      //   (^|[^*])  = must be at the start of a line OR preceded by a non-* character
+      //               (this prevents matching ** which is for bold)
+      //   \*        = opening single asterisk
+      //   ([^*\n]+) = capture text that is NOT another * and NOT a newline
+      //   \*        = closing single asterisk
+      //
+      // Examples:
+      //   "Give *Paracetamol* instead"  →  "Give <em>Paracetamol</em> instead"
+      //   "*Note:* check blood pressure" →  "<em>Note:</em> check blood pressure"
+      //
+      // Why [^*]? — To avoid matching the * inside **bold** text.
+      // "**bold**" has already been converted in step 3, but this guard
+      // prevents edge cases where a single * accidentally matches inside bold.
+      h = h.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+
+      // ── STEP 5: INLINE CODE ────────────────────────────────────────────────
+      // Backtick characters around text = code styling (monospace grey background).
+      //
+      // The regex:  /`([^`]+)`/g
+      //   `        = opening backtick
+      //   ([^`]+)  = capture any text that is NOT a backtick (so it stops at the next `)
+      //   `        = closing backtick
+      //
+      // Examples:
+      //   "See `SUPRA-KB-001` for details"  →  "See <code>SUPRA-KB-001</code> for details"
+      //   "Use `Paracetamol 650mg QDS`"     →  "Use <code>Paracetamol 650mg QDS</code>"
+      h = h.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+      // ── STEP 6: DASH BULLET POINTS ────────────────────────────────────────
+      // Lines starting with "- " or "• " become bullet list items.
+      //
+      // The regex:  /^\s*[-•]\s+(.+)$/gm
+      //   ^        = start of line
+      //   \s*      = optional leading spaces (handles indented bullets)
+      //   [-•]     = either a dash "-" or a bullet character "•"
+      //   \s+      = one or more spaces after the dash
+      //   (.+)     = capture the bullet text
+      //   $        = end of line
+      //
+      // Examples:
+      //   "- Paracetamol 650mg QDS"  →  "<li>Paracetamol 650mg QDS</li>"
+      //   "- Tramadol 50mg if VAS>6" →  "<li>Tramadol 50mg if VAS>6</li>"
+      //   "• Avoid NSAIDs"           →  "<li>Avoid NSAIDs</li>"
+      //
+      // Note: At this point the <li> items are not yet inside a <ul> container.
+      //       That happens in step 8 below.
+      h = h.replace(/^\s*[-•]\s+(.+)$/gm, '<li>$1</li>');
+
+      // ── STEP 7: NUMBERED LIST ITEMS ────────────────────────────────────────
+      // Lines starting with "1. ", "2. ", etc. also become bullet list items.
+      // We treat numbered lists the same as dash lists — both become <li>.
+      //
+      // The regex:  /^\s*\d+\.\s+(.+)$/gm
+      //   ^        = start of line
+      //   \s*      = optional leading spaces
+      //   \d+      = one or more digits (1, 2, 10, 99, etc.)
+      //   \.       = a literal dot "."
+      //   \s+      = space(s) after the dot
+      //   (.+)     = capture the list item text
+      //   $        = end of line
+      //
+      // Examples:
+      //   "1. Check blood pressure"  →  "<li>Check blood pressure</li>"
+      //   "2. Give Paracetamol"      →  "<li>Give Paracetamol</li>"
+      //   "10. Review in 48 hours"   →  "<li>Review in 48 hours</li>"
+      h = h.replace(/^\s*\d+\.\s+(.+)$/gm, '<li>$1</li>');
+
+      // ── STEP 8: WRAP LIST ITEMS IN <ul> ───────────────────────────────────
+      // Steps 6 & 7 created individual <li> items, but they need to be wrapped
+      // in a <ul> container for valid HTML and correct browser rendering.
+      //
+      // The regex finds the LAST <li> in a consecutive group (one that is NOT
+      // followed by another <li>), then wraps the entire group in <ul>...</ul>.
+      //
+      // The regex:  /(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g
+      //   (<li>[\s\S]*?<\/li>)  = one <li>...</li> item ([\s\S] matches anything
+      //                           including newlines; *? is non-greedy)
+      //   (?!\s*<li>)           = only match when NOT followed by another <li>
+      //                           (this is a "negative lookahead")
+      //
+      // Example — Before step 8:
+      //   "<li>Paracetamol</li>
+      //    <li>Tramadol</li>"
+      //
+      // After step 8:
+      //   "<ul><li>Paracetamol</li>
+      //    <li>Tramadol</li></ul>"
+      h = h.replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g, m => '<ul>' + m + '</ul>');
+
+      // ── STEP 9: MERGE ADJACENT LISTS ──────────────────────────────────────
+      // Step 8 might create two separate <ul> blocks right next to each other
+      // if there was a blank line between bullet groups. This step merges them
+      // into one clean list by removing the </ul><ul> boundary between them.
+      //
+      // Example — Before this step (two separate lists were created):
+      //   "<ul><li>Paracetamol</li></ul>
+      //    <ul><li>Tramadol</li></ul>"
+      //
+      // After this step (merged into one):
+      //   "<ul><li>Paracetamol</li>
+      //    <li>Tramadol</li></ul>"
+      h = h.replace(/<\/ul>\s*<ul>/g, '');
+
+      // ── STEP 10: REMOVE HORIZONTAL RULES ──────────────────────────────────
+      // In markdown, "---" on its own line means a horizontal line separator.
+      // We don't want those here (no styling for them), so just remove them.
+      //
+      // Example:
+      //   "Some text\n---\nMore text"  →  "Some text\n\nMore text"
+      h = h.replace(/^---$/gm, '');
+
+      // ── STEP 11: WRAP IN PARAGRAPHS ───────────────────────────────────────
+      // Finally, split the whole text into "blocks" separated by blank lines
+      // (two or more newlines). Each block becomes one of:
+      //
+      //   A) Left as-is  — if it's already an HTML tag like <h4> or <ul>
+      //   B) Wrapped in <p>...</p> — for normal text paragraphs
+      //      Single newlines within a paragraph become <br> (line breaks).
+      //
+      // The chain:
+      //   .split(/\n{2,}/)   = split wherever there are 2+ blank lines
+      //   .filter(b=>b.trim()) = throw away any empty blocks
+      //   .map(...)           = convert each block to final HTML
+      //   .join('')           = join all blocks back into one string
+      //
+      // Examples:
+      //
+      //   Block: "<h4>Safe Alternative</h4>"
+      //   → kept as-is (already starts with <h4>)
+      //
+      //   Block: "<ul><li>Paracetamol</li></ul>"
+      //   → kept as-is (already starts with <ul>)
+      //
+      //   Block: "Avoid NSAIDs.\nUse Paracetamol instead."
+      //   → "<p>Avoid NSAIDs.<br>Use Paracetamol instead.</p>"
+      //   (the single newline inside becomes <br>)
+      //
+      //   Block: "Patient Rajan has a cardiac stent."
+      //   → "<p>Patient Rajan has a cardiac stent.</p>"
+      return h.split(/\n{2,}/).filter(b => b.trim())
+        .map(b => /^<(h4|ul)/.test(b.trim()) ? b : '<p>' + b.replace(/\n/g, '<br>') + '</p>').join('');
+    }
+
+    // Scrolls the chat area to the very bottom so the latest message is always visible.
+    function scrollToBottom() { $('main').scrollTop = $('main').scrollHeight; }
+
+    // ── BOOT (runs once when the page first loads) ────────────────────────────
+    // Calls the server's /api/bootstrap endpoint to:
+    //   1. Find out which AI model is configured (Gemini, OpenAI, etc.)
+    //   2. Get the list of example questions (chip buttons)
+    // Then updates the status bar and renders the chip buttons.
+    async function boot() {
+      try {
+        const b = await (await fetch('/api/bootstrap')).json();
+        const l = b.llm; // LLM = Language Learning Model (the AI)
+
+        if (!l.configured) {
+          // No AI model is set up — will answer from raw protocols only
+          $('status').textContent = 'No model configured — answering directly from Supra protocols';
+        } else if (l.reachable === false) {
+          // AI model is configured but currently unreachable (e.g., API down)
+          $('status').textContent = l.provider + ' unavailable (' + l.detail + ') — answering directly from Supra protocols';
+        } else {
+          // AI model is working — show the model name in the status bar
+          $('status').textContent = 'Model: ' + l.provider + ' · ' + l.model;
+        }
+
+        // Render the quick-question chip buttons from the server's list
+        $('chips').innerHTML = b.test_queries
+          .map(q => '<button type="button">' + esc(q) + '</button>').join('');
+      } catch {
+        // Could not reach the server at all (network error, server down, etc.)
+        $('status').textContent = 'Could not reach the server';
+      }
+    }
+
+    // ── CHIP CLICK HANDLER ───────────────────────────────────────────────────
+    // When the user clicks a chip button, copy its text into the input box
+    // and automatically submit the form (same as pressing Ask).
+    $('chips').onclick = e => {
+      if (e.target.tagName === 'BUTTON') {
+        $('q').value = e.target.textContent.trim(); // fill in the input
+        $('f').requestSubmit();                      // submit the form
+      }
+    };
+
+    // ── RENDER (draws the AI's answer into the chat) ──────────────────────────
+    // Called after a successful API response.
+    //
+    // Parameters:
+    //   turn — the HTML div element for this conversation card
+    //   q    — the user's original question (string)
+    //   g    — the "governed" response object from the server
+    //          (contains the answer, safety info, mode, etc.)
+    function render(turn, q, g) {
+      let alert = '';
+
+      /* Safety-rule banner - commented out to review the layout without it.
+         The rule still fires server-side and still constrains the answer; this
+         only hides the separate red callout.
+      const hard=g.safety.rules_fired.filter(r=>r.enforcement==='hard_block');
+      if(hard.length){
+        alert='<div class="alert"><strong class="hd">Supra safety rule</strong>'+hard.map(r=>
+          '<p>'+esc(r.message)+'</p>').join('')+'</div>';
+      }
+      */
+
+      let degraded = '';
+      // If the AI model was unavailable, the server falls back to raw protocol text.
+      // Show a yellow warning banner so the user knows the response quality may differ.
+      if (g.mode === 'deterministic_fallback') {
+        degraded = '<p class="degraded">Language model unavailable' +
+          (g.llm_error ? ' (' + esc(g.llm_error) + ')' : '') +
+          '. This answer was assembled directly from Supra protocol and safety rules.</p>';
+        $('status').textContent = 'Language model unavailable — answering directly from Supra protocols';
+      }
+
+      // Build the full HTML for this conversation card:
+      //   [Blue question bar] + [optional alert] + [optional degraded warning] + [answer text]
+      turn.innerHTML = '<div class="q">' + esc(q) + '</div><div class="inner">' + alert + degraded +
+        '<div class="answer">' + md(g.answer) + '</div></div>';
+    }
+
+    // ── FORM SUBMIT HANDLER (fires when the user clicks Ask or presses Enter) ──
+    $('f').onsubmit = async e => {
+      e.preventDefault(); // Stop the page from reloading (default form behaviour)
+
+      const q = $('q').value.trim();
+      if (!q) return; // Ignore empty submissions
+
+      $('q').value = '';          // Clear the input box
+      $('send').disabled = true;  // Disable Ask button while waiting for the response
+
+      // Remove the intro welcome box (only needed before the first message)
+      const intro = $('intro');
+      if (intro) intro.remove();
+
+      // Create a new conversation card and immediately show "Checking Supra protocols..."
+      // as a loading placeholder while we wait for the server.
+      const turn = document.createElement('div');
+      turn.className = 'turn';
+      turn.innerHTML = '<div class="q">' + esc(q) +
+        '</div><div class="inner"><p class="loading">Checking Supra protocols...</p></div>';
+      $('msgs').appendChild(turn); // Add the card to the chat area
+      scrollToBottom();            // Scroll down so the loading card is visible
+
+      try {
+        // Send the user's question to the server API.
+        // signal: AbortSignal.timeout(45000) = automatically cancel if no response in 45 seconds.
+        const r = await fetch('/api/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: q }),
+          signal: AbortSignal.timeout(45000)
+        });
+
+        const data = await r.json();
+
+        // If the server returned an error message inside the JSON, throw it as an error
+        if (data.error) throw new Error(data.error);
+
+        // Success! Replace the loading placeholder with the real answer.
+        render(turn, q, data.governed);
+
+      } catch (err) {
+        // Something went wrong — show a red error box instead of the answer.
+        // Special case: if it timed out, show a friendly timeout message.
+        const msg = err.name === 'TimeoutError' ? 'The request timed out. Please try again.' : err.message;
+        turn.innerHTML = '<div class="q">' + esc(q) + '</div><div class="inner"><div class="alert">' +
+          '<strong class="hd">Request failed</strong><p>' + esc(msg) + '</p></div></div>';
+      }
+
+      // After success or error: re-enable the Ask button, scroll down, return focus to input
+      $('send').disabled = false;
+      scrollToBottom();
+      $('q').focus();
+    };
+
+    // Start the boot process as soon as the page loads
+    boot();
+  </script>
+</body>
+
+</html>
