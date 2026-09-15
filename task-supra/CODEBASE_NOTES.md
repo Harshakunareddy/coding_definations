@@ -1,7 +1,5 @@
 # Task-Supra Codebase — Revision Notes
 
-> Simple English summary of every file. Good for quick revision before interviews or code review.
-
 ---
 
 ## What is this project?
@@ -28,6 +26,223 @@ Clinician types a question
         ↓
    Final answer sent back to the browser
 ```
+
+---
+
+## 🏥 Real Example Walkthrough — Follow One Query End to End
+
+> **Scenario:** Dr. Priya opens the Supra Assistant and types:
+> **`"What painkiller should I give Rajan after his knee surgery?"`**
+
+---
+
+### Step 1 — The browser sends the question to `server.js`
+
+The browser does a `POST /api/ask` with 
+`{ query: "What painkiller should I give Rajan after his knee surgery?" }`.
+
+`server.js` receives it and does 3 quick checks:
+- Is it a string? ✅
+- Is it under 1000 characters? ✅
+- Is it a greeting like "hi" or "hello"? ❌ No — so it goes forward.
+
+It then calls `answer()` from `pipeline.js`, passing the query + the pre-loaded corpus + the pre-built BM25 index + the safety ruleset.
+
+---
+
+### Step 2 — `pipeline.js` starts the 8-step process
+
+`pipeline.js` is the **orchestrator**. It doesn't do any thinking itself — it just calls the right function at the right time.
+
+**Step 2.1 — Find relevant documents → calls `search()` in `retrieval.js`**
+
+The query `"What painkiller should I give Rajan after his knee surgery?"` goes into `search()`.
+
+Inside `retrieval.js → search()`:
+
+**Tokenize** the query first:
+```
+"What painkiller should I give Rajan after his knee surgery?"
+  → lowercase              → "what painkiller should i give rajan after his knee surgery?"
+  → strip punctuation      → "what painkiller should i give rajan after his knee surgery"
+  → split into words       → ["what", "painkiller", "should", "i", "give", "rajan", "after", "his", "knee", "surgery"]
+  → remove stopwords       → ["painkiller", "rajan", "knee", "surgery"]
+    (what, should, i, give, after, his → all stopwords, removed)
+```
+
+**Expand with synonyms:**
+```
+"painkiller" → adds ["pain", "analgesia", "analgesic"]
+"surgery"    → adds ["surgical", "operative", "post-op"]
+
+Final query tokens: ["painkiller", "rajan", "knee", "surgery", "pain", "analgesia", "analgesic", "surgical", "operative", "post-op"]
+```
+
+**Detect patient names:**
+```
+Known patients in corpus: ["Rajan", "Padma"]
+"rajan" found in query → mentionedPatients = ["Rajan"]
+```
+
+**Score every document using BM25** (TF × IDF for each token):
+
+| Document | Why it scores high | Score (approx) |
+|----------|--------------------|---------------|
+| `SUPRA-KB-001` Post-TKR Pain Management | "pain", "painkiller", "knee", "post-op", "surgery" all in it | **~9.5** |
+| `SUPRA-KB-002` Patient Rajan Drug Alert | "rajan" exact match + "knee pain", "prescribe" in tags | **~8.2** (then +12 patient boost → **~20.2**) |
+| `SUPRA-KB-004` DVT Prophylaxis | "post-op", "surgery", "knee" in tags | **~4.1** |
+| `SUPRA-KB-006` TKR Discharge Rule | "dvt", "surgery" weak match | **~2.1** |
+| Everything else | no matching tokens | ~0 |
+
+**Privacy guard on SUPRA-KB-002:**
+- KB-002 belongs to patient `"Rajan"`
+- Query mentions `"Rajan"` → ✅ allowed to show, not hidden
+- `+12` patient-entity boost added → score jumps to ~20.2
+
+**Critical boost on SUPRA-KB-002:**
+- `severity: "critical"` AND it matched terms → score × 1.35 → **~27.3**
+
+**Final ranking returned to `pipeline.js`:**
+```
+1st → SUPRA-KB-002  "Patient Rajan Drug Alert"        score ≈ 27.3
+2nd → SUPRA-KB-001  "Post-TKR Pain Management"        score ≈ 9.5
+3rd → SUPRA-KB-004  "DVT Prophylaxis"                 score ≈ 4.1
+```
+
+---
+
+**Step 2.2 — Filter weak results**
+
+`pipeline.js` applies floors:
+- `ABSOLUTE_FLOOR = 4.0` → drop any doc scoring below 4
+- `RELATIVE_FLOOR = 0.50` → drop any doc below 50% of top score (27.3 × 0.5 = 13.65)
+- KB-001 scores 9.5 → below 13.65 → **would be dropped**, BUT...
+- `COVERAGE_FLOOR = 6.0` → top score is 27.3, way above 6 → coverage is fine
+
+After filtering: **KB-002 and KB-001 pass** (pipeline force-includes KB-001 because it's the pain protocol referenced by safety rules — see Step 2.3).
+
+---
+
+**Step 2.3 — Check safety rules → calls `evaluateRules()` in `safety.js`**
+
+`safety.js` reads the ruleset from `safety_rules.json` and checks if any rules fire for this query.
+
+Rule fires: **NSAID block for Rajan** — because:
+- The rule has a `patient` trigger for `"Rajan"`
+- `"Rajan"` was detected in the query → **rule fires**
+
+Result:
+```
+fired = [ { rule: "No NSAIDs for Rajan", type: "hard_block",
+            blockedDrugs: ["ibuprofen", "diclofenac", "aspirin"],
+            safe_alternative: "Paracetamol" } ]
+blockedDrugs = ["ibuprofen", "diclofenac", "aspirin"]
+```
+
+**Force-include:** The fired rule references `SUPRA-KB-001` as its source doc. `pipeline.js` checks — KB-001 is already in topHits ✅ no extra action needed.
+
+---
+
+**Step 2.4 — Build prompts → calls `buildSystemPrompt()` + `buildUserPrompt()` in `prompt.js`**
+
+`prompt.js` builds two texts to send to the AI:
+
+**System prompt** (the AI's rules):
+```
+You are the Supra Assistant, the clinical decision-support system of
+Supra Multi-Specialty Hospital, Hyderabad.
+
+HARD BLOCK — [RULE for Rajan]:
+Do NOT prescribe NSAIDs for patient Rajan.
+REQUIRED ALTERNATIVE: Paracetamol.
+YOU MUST NOT RECOMMEND: ibuprofen, diclofenac, aspirin.
+
+[7 answering rules...]
+[Output format: Answer / Supra specifics / Why this differs / Also note]
+```
+
+**User prompt** (the documents + the question):
+```
+SUPRA HOSPITAL DOCUMENTS (the only source you may use):
+
+[SUPRA-KB-002] Patient Rajan Drug Alert
+(department: Cardiology | type: patient_safety_alert | decided by: Cardiology / Patient Safety Committee | effective: 2022)
+ABSOLUTE: No ibuprofen, no aspirin, no diclofenac for patient Rajan.
+Cardiac stent 2022, dual antiplatelet therapy...
+
+---
+
+[SUPRA-KB-001] Post-TKR Pain Management
+(department: Orthopaedics | type: protocol | decided by: Dr. Vikram | effective: 2025-01)
+Supra Ortho uses Paracetamol 650mg QDS as first-line post-TKR...
+
+---
+
+CLINICIAN'S QUESTION: What painkiller should I give Rajan after his knee surgery?
+```
+
+---
+
+**Step 2.5 — Call the AI → calls `complete()` in `llm.js`**
+
+`llm.js` checks which provider has a valid API key (e.g. OpenRouter), picks the configured model, and sends both prompts as a chat message.
+
+The AI replies with something like:
+```
+Answer: Use Paracetamol 650mg QDS for Rajan's post-TKR pain.
+
+Supra specifics: Per SUPRA-KB-001, Paracetamol is first-line post-TKR.
+Escalate to Tramadol 50mg if VAS > 6. [SUPRA-KB-001]
+
+Why this differs: NSAIDs are absolutely contraindicated for Rajan due to
+cardiac stent (2022) and dual antiplatelet therapy. [SUPRA-KB-002]
+
+Also note: 8 previous NSAID refusals documented for this patient.
+```
+
+`llm.js` returns: `{ ok: true, text: "...", model: "grok-4-fast", latency_ms: 1820 }`
+
+---
+
+**Step 2.6 — Output guard → calls `inspectOutput()` in `safety.js`**
+
+Even though the AI was told not to recommend NSAIDs, `safety.js` **double-checks the final answer** word by word:
+
+- Scan for `"ibuprofen"` → found? No ✅
+- Scan for `"diclofenac"` → found? No ✅
+- Scan for `"aspirin"` → found? No ✅
+
+`inspectOutput()` returns `{ passed: true }` → answer is safe, no suppression needed.
+
+---
+
+**Step 2.7 — Hallucination check**
+
+`pipeline.js` scans the answer for any `SUPRA-KB-XXX` IDs the AI mentioned:
+- `[SUPRA-KB-001]` → exists in corpus ✅
+- `[SUPRA-KB-002]` → exists in corpus ✅
+- `hallucinated_citations = []` → AI didn't invent any fake doc IDs ✅
+
+---
+
+### Step 3 — `server.js` sends the answer back to the browser
+
+`pipeline.js` returns a big object to `server.js`:
+```js
+{
+  answer:   "Use Paracetamol 650mg QDS for Rajan's post-TKR pain...",
+  mode:     "llm_governed",        // AI answered successfully
+  model:    "grok-4-fast",
+  latency_ms: 1820,
+  sources:  [ SUPRA-KB-002, SUPRA-KB-001 ],
+  safety:   { fired: [Rajan NSAID block], passed: true },
+  hallucinated_citations: []
+}
+```
+
+`server.js` wraps it as `{ governed: { ... } }` and sends it as JSON to the browser.
+
+**Dr. Priya sees the answer in under 2 seconds.** ✅
 
 ---
 
@@ -113,6 +328,89 @@ Clinician types a question
 - Also calculates **avgLength** — average token count across all docs (used for length normalisation)
 - Returns `{ docs, df, avgLength, N }` — everything `search()` needs
 
+#### `buildIndex()` — step by step with a mini example
+
+Imagine we have **2 documents** going in:
+
+```
+Doc A:  title = "DVT Protocol"
+        content = "DVT prophylaxis is required post-op"
+
+Doc B:  title = "Pain Protocol"
+        content = "Pain management after surgery"
+```
+
+**Step 1 — Build the text blob for each doc**
+
+Title is repeated 3× so it scores higher. Tags repeated 2×.
+
+```
+Doc A text blob:
+  "DVT Protocol  DVT Protocol  DVT Protocol  dvt dvt  DVT prophylaxis is required post-op"
+   ^^^title×3^^^                              ^^tags×2^^  ^^^content^^^
+
+Doc B text blob:
+  "Pain Protocol  Pain Protocol  Pain Protocol  pain pain  Pain management after surgery"
+```
+
+**Step 2 — Tokenize each blob**  
+(lowercase → strip punct → split → remove stopwords)
+
+```
+Doc A tokens:  ["dvt", "protocol", "dvt", "protocol", "dvt", "protocol",
+                "dvt", "dvt", "dvt", "prophylaxis", "required", "post-op"]
+
+Doc B tokens:  ["pain", "protocol", "pain", "protocol", "pain", "protocol",
+                "pain", "pain", "pain", "management", "surgery"]
+```
+
+**Step 3 — Build TF map for each doc**  
+(count occurrences of each token *in that doc only*)
+
+```
+Doc A TF:  { dvt: 6, protocol: 3, prophylaxis: 1, required: 1, post-op: 1 }
+Doc B TF:  { pain: 6, protocol: 3, management: 1, surgery: 1 }
+```
+
+**Step 4 — Build the shared DF map**  
+(count *how many docs* contain each token — just 1 per doc, not total occurrences)
+
+```
+            Doc A   Doc B   DF count
+dvt          ✓       ✗        1
+protocol     ✓       ✓        2   ← common word, lower IDF → lower final score
+prophylaxis  ✓       ✗        1
+pain         ✗       ✓        1
+surgery      ✗       ✓        1
+
+DF map:  { dvt: 1, protocol: 2, prophylaxis: 1, pain: 1, surgery: 1, ... }
+```
+
+**Step 5 — Calculate avgLength**
+
+```
+Doc A length = 12 tokens
+Doc B length = 11 tokens
+avgLength    = (12 + 11) / 2 = 11.5
+```
+
+**Step 6 — Return the index**
+
+```js
+{
+  docs: [
+    { doc: DocA, tf: Map{ dvt→6, protocol→3, ... }, length: 12 },
+    { doc: DocB, tf: Map{ pain→6, protocol→3, ... }, length: 11 }
+  ],
+  df:        Map{ dvt→1, protocol→2, prophylaxis→1, pain→1, surgery→1 },
+  avgLength: 11.5,
+  N:         2        // total number of docs
+}
+```
+
+> `search()` then uses this to score a query: **high TF + low DF = high score**.  
+> `"dvt"` scores better than `"protocol"` because `"protocol"` is in *both* docs (DF=2) so it's less distinctive.
+
 #### How `search()` works step by step:
 1. Tokenize the query → `["dvt", "prophylaxis"]`
 2. Expand with synonyms → `["dvt", "prophylaxis", "deep", "vein", ...]`
@@ -124,6 +422,110 @@ Clinician types a question
 8. Sort by score descending
 9. **Linked-doc promotion:** if a high-scoring doc (score > 3) links to another doc, the linked doc gets 85% of the parent's score
 10. Re-sort and return
+
+#### `search()` — step by step with a mini example
+
+Using the **same DocA / DocB index** from `buildIndex()` above.  
+Query typed by the clinician: **`"dvt post-op"`**
+
+```
+Index we have:
+  N = 2 docs,  avgLength = 11.5
+  df  = { dvt:1, protocol:2, prophylaxis:1, post-op:1, pain:1, surgery:1 }
+  Doc A tf = { dvt:6, protocol:3, prophylaxis:1, post-op:1 }   length=12
+  Doc B tf = { pain:6, protocol:3, surgery:1 }                 length=11
+```
+
+**Step 1 — Tokenize the query**
+
+```
+"dvt post-op"
+  → lowercase   → "dvt post-op"
+  → split       → ["dvt", "post-op"]
+  → stopwords   → ["dvt", "post-op"]   (neither is a stopword)
+```
+
+**Step 2 — Expand with synonyms**
+
+```
+"dvt"     → adds ["deep", "vein", "thrombosis", "prophylaxis", "clot"]
+"post-op" → adds ["post", "op", "surgery", "surgical"]
+
+Final query tokens: ["dvt", "post-op", "deep", "vein", "thrombosis", "prophylaxis", "clot",
+                     "post", "op", "surgery", "surgical"]
+```
+
+**Step 3 — Score each doc using BM25**
+
+For every query token, compute: `IDF × TF-saturation` and add to score.
+
+BM25 formula per token:
+```
+IDF            = log(1 + (N - df + 0.5) / (df + 0.5))
+TF-saturation  = (f × (K1+1)) / (f + K1 × (1 - B + B × docLen/avgLen))
+                  where K1=1.5, B=0.75
+```
+
+Scoring **Doc A** for token `"dvt"`:
+```
+f   = 6  (dvt appears 6 times in Doc A)
+df  = 1  (only 1 doc has dvt)
+IDF = log(1 + (2 - 1 + 0.5) / (1 + 0.5))  = log(1 + 1.0) = 0.69
+TF-sat = (6 × 2.5) / (6 + 1.5 × (0.25 + 0.75 × 12/11.5))
+       = 15 / (6 + 1.5 × 1.033)
+       = 15 / 7.55  ≈ 1.99
+
+dvt contribution to Doc A score = 0.69 × 1.99 ≈ 1.37
+```
+
+Scoring **Doc A** for token `"post-op"`:
+```
+f   = 1  (post-op appears 1 time in Doc A)
+df  = 1  (only 1 doc has it)
+IDF = 0.69  (same as dvt — both appear in exactly 1 doc)
+TF-sat ≈ 0.77
+
+post-op contribution ≈ 0.69 × 0.77 ≈ 0.53
+```
+
+Scoring **Doc B** for token `"surgery"` (came from synonym expansion of "post-op"):
+```
+f   = 1  (surgery appears in Doc B)
+df  = 1
+IDF = 0.69
+TF-sat ≈ 0.77
+
+surgery contribution to Doc B ≈ 0.53
+```
+
+Adding up all matching tokens:
+
+```
+Doc A matched: dvt(1.37) + post-op(0.53) + prophylaxis(~0.5) = ~2.40
+Doc B matched: surgery(0.53)                                  = ~0.53
+```
+
+**Step 4 — Apply boosts/guards**
+
+```
+Neither doc has a patient field → no privacy guard, no patient boost
+Neither doc is marked severity:critical → no critical boost
+
+Final scores:
+  Doc A = 2.40  ✅  (matched dvt + post-op directly)
+  Doc B = 0.53  (only matched via synonym expansion)
+```
+
+**Step 5 — Sort and return**
+
+```
+Ranked results:
+  1st → Doc A "DVT Protocol"   score=2.40
+  2nd → Doc B "Pain Protocol"  score=0.53
+```
+
+> **Doc A wins** because both query tokens (`dvt`, `post-op`) were found directly in it with high TF, while Doc B only got a weak synonym match (`surgery` ← from `post-op` expansion).
+
 
 ---
 
