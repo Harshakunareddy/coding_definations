@@ -249,14 +249,3 @@ The doctor sees the answer in under 2-3 seconds.
 
 ---
 
-## Confidence tip
-
-You built a system with:
-- A custom search engine (BM25)
-- A two-phase safety layer (pre + post AI check)
-- Hallucination detection
-- Multi-provider AI support with automatic fallback
-- Patient privacy enforcement
-
-That is not a small project. That is a production-grade clinical AI system.
-Say it with confidence.
