@@ -714,31 +714,31 @@ Example:
 
 Basic example:
 
-name: Deploy Application
+
+name: Deploy Node.js App
 
 on:
-
   push:
     branches:
       - main
 
-
 jobs:
-
   deploy:
-
     runs-on: ubuntu-latest
 
     steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test
+          script: |
+            cd /var/www/my-app
+            git pull origin main
+            npm install
+            pm2 restart my-app
 
 
 -----------------------------------------------------------
@@ -1332,6 +1332,47 @@ Nginx
 Node.js
    ↓
 Database"
+
+
+
+===========================================================
+18. KUBERNETES (K8S)
+===========================================================
+
+Kubernetes is a container orchestration platform used to
+manage Docker/containerized applications.
+
+It helps with:
+- Deploying containers
+- Scaling applications
+- Load balancing
+- Restarting failed containers
+- Rolling updates
+
+Important terms:
+
+Cluster → Group of machines managed by Kubernetes.
+Node → Machine/server inside the cluster.
+Pod → Smallest unit that runs a container.
+Deployment → Manages the number and version of Pods.
+Service → Provides stable access to Pods and distributes traffic.
+Ingress → Handles external HTTP/HTTPS traffic.
+kubectl → Command-line tool used to manage Kubernetes.
+
+Simple flow:
+
+Docker Image
+↓
+Kubernetes Cluster
+↓
+Node
+↓
+Pod
+↓
+Container
+↓
+Node.js Application
+
 
 
 ===========================================================

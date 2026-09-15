@@ -256,34 +256,34 @@
 
 <!-- sliding window -->
 <script>
-    function KConsecusitiveMaxSum(arr,k){
+    function KConsecusitiveMaxSum(arr, k) {
         sum = 0;
-        for(let i=0;i<k;i++){
-            sum+=arr[i]
+        for (let i = 0; i < k; i++) {
+            sum += arr[i]
         }
         max_sum = sum;
-        for(let i=k;i<arr.length;i++){
+        for (let i = k; i < arr.length; i++) {
             sum += arr[i];
-            sum -= arr[i-k];
-            max_sum = Math.max(sum,max_sum);
+            sum -= arr[i - k];
+            max_sum = Math.max(sum, max_sum);
         }
         return max_sum;
     }
 </script>
 
 <script>
-    function KConsecutivePositiveMaxCount(arr,k){
+    function KConsecutivePositiveMaxCount(arr, k) {
         let count = 0;
-        for(let i=0;i<k; i++){
-            if(arr[i]>0) {
+        for (let i = 0; i < k; i++) {
+            if (arr[i] > 0) {
                 count++;
             }
             let max_count = count;
-            for(let i=k; i<arr.length; i++){
-                if(arr[i] > 0){
+            for (let i = k; i < arr.length; i++) {
+                if (arr[i] > 0) {
                     count++;
                 }
-                if(arr[i-k] > 0){
+                if (arr[i - k] > 0) {
                     count--;
                 }
 
@@ -292,37 +292,37 @@
         }
         return max_count;
     }
-    console.log(KConsecutivePositiveMaxCount([1,-2,2,3,-1,4]),3);
+    console.log(KConsecutivePositiveMaxCount([1, -2, 2, 3, -1, 4]), 3);
 </script>
 
 
 <!-- two pointers -->
 <script>
-    function SortedArrayTarget(arr, t){
+    function SortedArrayTarget(arr, t) {
         let left = 0;
         let right = arr.length - 1;
-        while(left< right){
+        while (left < right) {
             let sum = arr[left] + arr[right];
-            if (sum== target){
-                return [left,right]
+            if (sum == target) {
+                return [left, right]
             }
-            if(sum<target){
+            if (sum < target) {
                 left++;
             }
-            else{
+            else {
                 right--
             }
         }
         return [];
     }
-    console.log([1,2,3,4,5], 5);
+    console.log([1, 2, 3, 4, 5], 5);
 </script>
 
 <script>
-    function MoveZeroes(arr){
+    function MoveZeroes(arr) {
         let left = 0;
-        for(let right =0; right< arr.length; right++){
-            if(arr[right] > 0){
+        for (let right = 0; right < arr.length; right++) {
+            if (arr[right] > 0) {
                 [arr[left], arr[right]] = [arr[right], arr[left]];
                 left++;
             }
@@ -330,18 +330,18 @@
 
         return arr;
     }
-    console.log([1,2,30,0,3,0]);
+    console.log([1, 2, 30, 0, 3, 0]);
 </script>
 
 
 <!-- hash map -->
 
 <script>
-    function TwoSum(arr,target){
+    function TwoSum(arr, target) {
         let ch = {};
-        for(let i=0;i < arr.length; i++){
+        for (let i = 0; i < arr.length; i++) {
             let needed = target - arr[i];
-            if(ch[needed] !== undefined){
+            if (ch[needed] !== undefined) {
                 return [needed, arr[i]]
             }
 
@@ -351,8 +351,8 @@
         return [];
     }
 
-    console.log(TwoSum([2,1,2,3,5]), 3);
-    
+    console.log(TwoSum([2, 1, 2, 3, 5]), 3);
+
 </script>
 
 

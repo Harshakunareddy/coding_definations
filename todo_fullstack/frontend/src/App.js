@@ -11,7 +11,7 @@ const App = () => {
         setUser(e.target.value);
     }
 
-    
+
     const handleChangeAge = (e) => {
         setAge(e.target.value);
     }
@@ -27,16 +27,17 @@ const App = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (editUser !== null){
+        if (editUser !== null) {
             let a = [...users];
             a[editUser] = user;
-            
+
+
             setUsers(a);
 
 
             setEditUser(null);
         }
-        else{
+        else {
             console.log("user = ", user);
             setUsers([...users, { age: age, name: user }]);
             console.log("user = 3 ", user);
@@ -47,21 +48,21 @@ const App = () => {
 
     return (
         <>
-            <div align="center" style={{ margin:'20px 10px' }}>
+            <div align="center" style={{ margin: '20px 10px' }}>
                 <div>
                     <input type="text" name="user" value={user || ""} onChange={handleChange} />
                     <input type="number" name="age" value={age || ""} onChange={handleChangeAge} />
-                    <button onClick={handleSubmit}>submit</button>    
-                </div>    
+                    <button onClick={handleSubmit}>submit</button>
+                </div>
             </div>
             <div>
-                {users.map((user,index)=>(
+                {users.map((user, index) => (
                     <ul key={index}>
                         <li>
 
                             {user.name}
-                            <span style={{ margin:'0px 20px' }} >
-                                
+                            <span style={{ margin: '0px 20px' }} >
+
                                 <button onClick={() => handleUpdate(index)}>Edit</button>
                                 <button onClick={() => handleDelete(index)}>delete</button>
 
@@ -70,7 +71,7 @@ const App = () => {
                     </ul>
                 ))}
             </div>
-            
+
         </>
     )
 }

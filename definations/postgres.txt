@@ -183,6 +183,11 @@ Used for advanced queries like ranking.
 */
 SELECT name, RANK() OVER (ORDER BY name) FROM users;
 
+SELECT name, salary,
+       RANK() OVER (ORDER BY salary DESC) AS rank
+FROM employees;
+
+
 
 /*
 20. DIFFERENCE JSON vs JSONB

@@ -52,61 +52,94 @@ It then calls `answer()` from `pipeline.js`, passing the query + the pre-loaded 
 
 ### Step 2 — `pipeline.js` starts the 8-step process
 
-`pipeline.js` is the **orchestrator**. It doesn't do any thinking itself — it just calls the right function at the right time.
+`pipeline.js` is the **orchestrator**. It doesn't do any thinking itself — it just calls the right function at the right time in order.
+
+---
 
 **Step 2.1 — Find relevant documents → calls `search()` in `retrieval.js`**
 
-The query `"What painkiller should I give Rajan after his knee surgery?"` goes into `search()`.
+The query goes into `search()` inside `retrieval.js`. It does 4 things:
 
-Inside `retrieval.js → search()`:
+---
 
-**Tokenize** the query first:
+**① Tokenize — clean the query into bare keywords**
+
 ```
 "What painkiller should I give Rajan after his knee surgery?"
-  → lowercase              → "what painkiller should i give rajan after his knee surgery?"
-  → strip punctuation      → "what painkiller should i give rajan after his knee surgery"
-  → split into words       → ["what", "painkiller", "should", "i", "give", "rajan", "after", "his", "knee", "surgery"]
-  → remove stopwords       → ["painkiller", "rajan", "knee", "surgery"]
-    (what, should, i, give, after, his → all stopwords, removed)
+
+  → lowercase      : "what painkiller should i give rajan after his knee surgery?"
+  → strip punct    : "what painkiller should i give rajan after his knee surgery"
+  → split words    : ["what","painkiller","should","i","give","rajan","after","his","knee","surgery"]
+  → drop stopwords : ["painkiller", "rajan", "knee", "surgery"]
+                      removed: what, should, i, give, after, his  (common words, useless)
 ```
 
-**Expand with synonyms:**
+---
+
+**② Expand — add synonyms to catch more docs**
+
 ```
-"painkiller" → adds ["pain", "analgesia", "analgesic"]
-"surgery"    → adds ["surgical", "operative", "post-op"]
+"painkiller" → in SYNONYMS → adds ["pain", "analgesia", "analgesic"]
+"surgery"    → in SYNONYMS → adds ["surgical", "operative", "post-op"]
+"rajan"      → not in SYNONYMS → kept as-is
+"knee"       → not in SYNONYMS → kept as-is
 
-Final query tokens: ["painkiller", "rajan", "knee", "surgery", "pain", "analgesia", "analgesic", "surgical", "operative", "post-op"]
+Final search tokens:
+["painkiller", "rajan", "knee", "surgery", "pain", "analgesia", "analgesic", "surgical", "operative", "post-op"]
 ```
 
-**Detect patient names:**
+> Why expand? SUPRA-KB-001 says "post-TKR" not "surgery" — without expansion it scores lower.
+
+---
+
+**③ Detect patient names**
+
 ```
-Known patients in corpus: ["Rajan", "Padma"]
-"rajan" found in query → mentionedPatients = ["Rajan"]
+All known patients in knowledge.json : ["Rajan", "Padma"]
+"rajan" found in query               → mentionedPatients = ["Rajan"]
 ```
 
-**Score every document using BM25** (TF × IDF for each token):
+Any doc belonging to a patient NOT named here → score forced to 0 (hidden from results).
 
-| Document | Why it scores high | Score (approx) |
-|----------|--------------------|---------------|
-| `SUPRA-KB-001` Post-TKR Pain Management | "pain", "painkiller", "knee", "post-op", "surgery" all in it | **~9.5** |
-| `SUPRA-KB-002` Patient Rajan Drug Alert | "rajan" exact match + "knee pain", "prescribe" in tags | **~8.2** (then +12 patient boost → **~20.2**) |
-| `SUPRA-KB-004` DVT Prophylaxis | "post-op", "surgery", "knee" in tags | **~4.1** |
-| `SUPRA-KB-006` TKR Discharge Rule | "dvt", "surgery" weak match | **~2.1** |
-| Everything else | no matching tokens | ~0 |
+---
 
-**Privacy guard on SUPRA-KB-002:**
-- KB-002 belongs to patient `"Rajan"`
-- Query mentions `"Rajan"` → ✅ allowed to show, not hidden
-- `+12` patient-entity boost added → score jumps to ~20.2
+**④ BM25 Score — score all 15 docs and apply boosts**
 
-**Critical boost on SUPRA-KB-002:**
-- `severity: "critical"` AND it matched terms → score × 1.35 → **~27.3**
-
-**Final ranking returned to `pipeline.js`:**
 ```
-1st → SUPRA-KB-002  "Patient Rajan Drug Alert"        score ≈ 27.3
-2nd → SUPRA-KB-001  "Post-TKR Pain Management"        score ≈ 9.5
-3rd → SUPRA-KB-004  "DVT Prophylaxis"                 score ≈ 4.1
+SUPRA-KB-001  "Post-TKR Pain Management"
+  matched tokens : pain(TF=3), painkiller(TF=2), knee(TF=1), post-op(TF=2), surgery(TF=1)
+  raw BM25       : ~9.5
+  patient field  : null → no guard, no boost
+  severity       : "high" → no critical boost
+  FINAL SCORE    : 9.5
+
+SUPRA-KB-002  "Patient Rajan Drug Alert"
+  matched tokens : rajan(TF=4), knee(TF=1), pain(TF=1)
+  raw BM25       : ~8.2
+  patient field  : "Rajan" → IS in query → ✅ not hidden → +12 boost → 8.2 + 12 = 20.2
+  severity       : "critical" + matched terms → ×1.35 → 20.2 × 1.35 = ~27.3
+  FINAL SCORE    : 27.3  ← highest
+
+SUPRA-KB-004  "DVT Prophylaxis"
+  matched tokens : post-op(TF=2), surgery(TF=2), knee(TF=1) via tags
+  raw BM25       : ~4.1
+  FINAL SCORE    : 4.1
+
+SUPRA-KB-006  "TKR Discharge Rule"
+  matched tokens : surgery(TF=1) — weak
+  raw BM25       : ~2.1
+  FINAL SCORE    : 2.1
+
+All other 11 docs → 0  (no query tokens matched)
+```
+
+**Ranked results returned to `pipeline.js`:**
+```
+1st → SUPRA-KB-002  "Patient Rajan Drug Alert"    score = 27.3  ← critical patient record
+2nd → SUPRA-KB-001  "Post-TKR Pain Management"    score = 9.5   ← the pain protocol
+3rd → SUPRA-KB-004  "DVT Prophylaxis"             score = 4.1   ← weak match via tags
+4th → SUPRA-KB-006  "TKR Discharge Rule"          score = 2.1   ← very weak
+rest→ everything else                             score = 0
 ```
 
 ---

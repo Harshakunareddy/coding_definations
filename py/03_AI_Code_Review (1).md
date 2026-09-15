@@ -160,7 +160,7 @@ Is this user allowed to delete this resource?
 
 ---
 
-# LEVEL 4 — IDOR
+# LEVEL 4 — IDOR - full form => Insecure Direct Object Reference
 
 ## Endpoint
 
