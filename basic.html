@@ -25,6 +25,10 @@
 </script>
 
 
+<!-- let reverse = Number(num.toString().split("").reverse().join("")); -->
+
+
+
 <script>
     function PalindromeOrNot(str) {
         return str === str.split('').reverse().join('');
@@ -155,6 +159,168 @@
 
     console.log(SwappinOfTwoNumbersWithooutThird(10, 20));
 </script>
+
+
+<script>
+    // let a = 10, b = 25, c = 15;
+    // console.log(Math.max(a, b, c));
+</script>
+
+<script>
+    // 9. Fibonacci Series
+    let a = 0, b = 1;
+
+    for (let i = 0; i < 10; i++) {
+        console.log(a);
+        let temp = a + b;
+        a = b;
+        b = temp;
+    }
+</script>
+
+
+<script>
+    // 11. Count Vowels
+    let str = "javascript";
+    let count = 0;
+
+    for (let char of str) {
+        if ("aeiou".includes(char)) {
+            count++;
+        }
+    }
+
+    console.log(count);
+</script>
+
+
+<script>
+    // 15. Sort an Array
+    let arr = [5, 2, 8, 1, 3];
+
+    arr.sort((a, b) => a - b);
+
+    console.log(arr);
+    // Output: [1, 2, 3, 5, 8]
+</script>
+
+
+<script>
+    // 18. Check Anagram
+    let str1 = "listen";
+    let str2 = "silent";
+
+    let a2 = str1.split("").sort().join("");
+    let b2 = str2.split("").sort().join("");
+
+    console.log(a2 === b2 ? "Anagram" : "Not Anagram");
+// Output: Anagram
+</script>
+
+
+<script>
+    // 20. Check Armstrong Number
+    let num = 153;
+    let temp = num;
+    let sum = 0;
+
+    while (temp > 0) {
+        let digit = temp % 10;
+        sum += digit ** 3;
+        temp = Math.floor(temp / 10);
+    }
+    console.log(sum === num ? "Armstrong" : "Not Armstrong");
+
+// Output: Armstrong
+</script>
+
+
+
+<script>
+    // 2. Find Sum of Digits
+    let num1 = 1234;
+    let sum1 = 0;
+
+    while (num1 > 0) {
+        sum1 += num1 % 10;
+        num1 = Math.floor(num1 / 10);
+    }
+
+    console.log(sum);
+
+
+// Output: 10
+</script>
+
+
+<script>
+
+    // 3. Count Digits in a Number
+    let num = 12345;
+    let count = 0;
+
+    while (num > 0) {
+        count++;
+        num = Math.floor(num / 10);
+    }
+
+    console.log(count);
+
+
+// Output: 5
+</script>
+
+
+
+<script>
+    // 5. Multiplication Table
+    let num = 5;
+
+    for (let i = 1; i <= 10; i++) {
+        console.log(`${num} x ${i} = ${num * i}`);
+    }
+</script>
+
+
+<script>
+    // 6. Check Leap Year
+    let year = 2024;
+
+    if ((year % 400 === 0) ||
+        (year % 4 === 0 && year % 100 !== 0)) {
+        console.log("Leap Year");
+    } else {
+        console.log("Not Leap Year");
+    }
+</script>
+
+
+<script>
+
+    // 9. Check Perfect Number
+    // A number is perfect if the sum of its proper divisors equals the number.
+    let num = 6;
+    let sum = 0;
+
+    for (let i = 1; i < num; i++) {
+        if (num % i === 0) {
+            sum += i;
+        }
+    }
+
+    console.log(sum === num ? "Perfect Number" : "Not Perfect");
+
+
+// Output: Perfect Number
+</script>
+
+
+<script>
+
+
+</script>
+
+
 
 
 <!-- <script>
